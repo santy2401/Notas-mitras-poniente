@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renta de Trajes - D&C Tuxedos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0A192F 0%, #1a2d4a 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0A192F 0%, #050505 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid #A68A56;
+        }
+
+        .header h1 {
+            font-family: 'Georgia', serif;
+            font-size: 32px;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #A68A56;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .form-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-family: 'Georgia', serif;
+            color: #0A192F;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid #A68A56;
+            font-weight: bold;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: #0A192F;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #A68A56;
+            box-shadow: 0 0 5px rgba(166, 138, 86, 0.3);
+        }
+
+        .suit-section {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .suit-title {
+            color: #0A192F;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #A68A56;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+            align-items: center;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            text-transform: none;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #A68A56;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .conditional-fields {
+            background: #f0f8ff;
+            border-left: 4px solid #A68A56;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #0A192F 0%, #1a2d4a 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #A68A56;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: #A68A56;
+            font-weight: bold;
+        }
+
+        .summary-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #A68A56;
+        }
+
+        .requirements {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .requirements-title {
+            color: #856404;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .requirements-text {
+            color: #856404;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        input[type="checkbox"] {
+            accent-color: #A68A56;
+            cursor: pointer;
+        }
+
+        .signature-section {
+            border-top: 2px solid #0A192F;
+            padding-top: 20px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .signature-box {
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 2px solid #0A192F;
+            margin-bottom: 5px;
+            height: 60px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .signature-label {
+            font-size: 12px;
+            color: #0A192F;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #A68A56 0%, #8b6f47 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-submit:hover {
+            box-shadow: 0 5px 15px rgba(166, 138, 86, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: #e0e0e0;
+            color: #0A192F;
+        }
+
+        .btn-reset:hover {
+            background: #d0d0d0;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .signature-section {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>D&C TUXEDOS</h1>
+            <p>FORMULARIO DE RENTA - TRAJES Y SMOKING</p>
+        </div>
+
+        <div class="form-content">
+            <div class="success-message" id="successMessage">
+                ✓ Formulario enviado correctamente. Se agregó con <strong>Folio: <span id="folioNumber"></span></strong>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                ✗ Error al enviar el formulario: <span id="errorText"></span>
+            </div>
+
+            <form id="rentForm">
+                <!-- DATOS DEL CLIENTE -->
+                <div class="section">
+                    <h2 class="section-title">Información del Cliente</h2>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="nombre">Nombre Completo *</label>
+                            <input type="text" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono *</label>
+                            <input type="tel" id="telefono" name="telefono" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="direccion">Dirección *</label>
+                            <input type="text" id="direccion" name="direccion" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ciudad">Ciudad *</label>
+                            <input type="text" id="ciudad" name="ciudad" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FECHAS -->
+                <div class="section">
+                    <h2 class="section-title">Fechas del Evento</h2>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="fechaEvento">Fecha del Evento *</label>
+                            <input type="date" id="fechaEvento" name="fechaEvento" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaEntrega">Fecha de Entrega *</label>
+                            <input type="date" id="fechaEntrega" name="fechaEntrega" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaDevolucion">Fecha de Devolución *</label>
+                            <input type="date" id="fechaDevolucion" name="fechaDevolucion" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODO DE ENTREGA -->
+                <div class="section">
+                    <h2 class="section-title">Opción de Entrega</h2>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="tipoEntrega" value="sucursal" checked>
+                            Recepción en Sucursal
+                        </label>
+                        <label>
+                            <input type="radio" name="tipoEntrega" value="domicilio">
+                            A Domicilio
+                        </label>
+                    </div>
+
+                    <div class="conditional-fields" id="domicilioFields" style="display: none;">
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="coordenadas">Coordenadas GPS</label>
+                                <input type="text" id="coordenadas" name="coordenadas" placeholder="Ej: 25.8757° N, 97.3964° W">
+                            </div>
+                            <div class="form-group">
+                                <label for="horarioEntrega">Horario de Entrega *</label>
+                                <select id="horarioEntrega" name="horarioEntrega">
+                                    <option value="">Seleccionar horario</option>
+                                    <option value="12:00pm-4:00pm">12:00 PM - 4:00 PM</option>
+                                    <option value="5:00pm-8:00pm">5:00 PM - 8:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRIMER TRAJE -->
+                <div class="section">
+                    <h2 class="section-title">Primer Traje</h2>
+                    <div class="suit-section">
+                        <div class="suit-title">Especificaciones - Traje 1</div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="saco1">Saco (Talla / Ajuste Manga) *</label>
+                                <input type="text" id="saco1" name="saco1" placeholder="Ej: M / Manga 76cm" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pantalon1">Pantalón (Largo) *</label>
+                                <input type="text" id="pantalon1" name="pantalon1" placeholder="Ej: 90cm" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="camisa1">Camisa (Talla) *</label>
+                                <input type="text" id="camisa1" name="camisa1" placeholder="Ej: 16.5" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="accesorios1">Accesorios (Corbata, Pañuelo, etc.)</label>
+                                <textarea id="accesorios1" name="accesorios1" placeholder="Especificar accesorios requeridos"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEGUNDO TRAJE -->
+                <div class="section">
+                    <h2 class="section-title">Segundo Traje (Opcional)</h2>
+                    <div class="suit-section">
+                        <div class="suit-title">Especificaciones - Traje 2</div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="saco2">Saco (Talla / Ajuste Manga)</label>
+                                <input type="text" id="saco2" name="saco2" placeholder="Ej: M / Manga 76cm">
+                            </div>
+                            <div class="form-group">
+                                <label for="pantalon2">Pantalón (Largo)</label>
+                                <input type="text" id="pantalon2" name="pantalon2" placeholder="Ej: 90cm">
+                            </div>
+                            <div class="form-group">
+                                <label for="camisa2">Camisa (Talla)</label>
+                                <input type="text" id="camisa2" name="camisa2" placeholder="Ej: 16.5">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="accesorios2">Accesorios (Corbata, Pañuelo, etc.)</label>
+                                <textarea id="accesorios2" name="accesorios2" placeholder="Especificar accesorios requeridos"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REQUISITOS -->
+                <div class="section">
+                    <h2 class="section-title">Requisitos y Conformidad</h2>
+                    <div class="requirements">
+                        <div class="requirements-title">⚠ Requisitos Obligatorios</div>
+                        <div class="requirements-text">
+                            <p>✓ Fotografía de identificación oficial (INE, Pasaporte)<br>
+                            ✓ Comprobante de domicilio (no mayor a 3 meses)<br>
+                            ✓ Datos de referencia de contacto<br>
+                            ✓ Se requiere depósito o anticipo del 30% del total<br>
+                            ✓ Los trajes deben ser devueltos en las condiciones recibidas</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="confirmRequisitos" name="confirmRequisitos" required>
+                        <label for="confirmRequisitos" style="margin-bottom: 0; text-transform: none; font-weight: normal;">
+                            Confirmo que cuento con todos los requisitos solicitados
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="confirmCondiciones" name="confirmCondiciones" required>
+                        <label for="confirmCondiciones" style="margin-bottom: 0; text-transform: none; font-weight: normal;">
+                            Acepto las condiciones de renta y los términos de devolución
+                        </label>
+                    </div>
+                </div>
+
+                <!-- MONTOS -->
+                <div class="section">
+                    <h2 class="section-title">Resumen de Montos</h2>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="importe">Importe Total (MXN) *</label>
+                            <input type="number" id="importe" name="importe" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="anticipo">Anticipo (MXN) *</label>
+                            <input type="number" id="anticipo" name="anticipo" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="saldo">Saldo (MXN)</label>
+                            <input type="number" id="saldo" name="saldo" min="0" step="0.01" readonly style="background-color: #f5f5f5;">
+                        </div>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-item">
+                            <span class="summary-label">Importe Total:</span>
+                            <span>$ <span id="displayImporte">0.00</span></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Anticipo Recibido:</span>
+                            <span>$ <span id="displayAnticipo">0.00</span></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label summary-total">Saldo a Pagar:</span>
+                            <span class="summary-total">$ <span id="displaySaldo">0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FIRMA -->
+                <div class="section">
+                    <h2 class="section-title">Conformidad del Cliente</h2>
+                    <div class="signature-section">
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-label">Firma del Cliente</div>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-label" style="margin-bottom: 65px;">Fecha: ______________</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTONES -->
+                <div class="button-group">
+                    <button type="submit" class="btn-submit" id="submitBtn">Enviar Formulario</button>
+                    <button type="reset" class="btn-reset">Limpiar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('rentForm');
+        const tipoEntregaRadios = document.querySelectorAll('input[name="tipoEntrega"]');
+        const domicilioFields = document.getElementById('domicilioFields');
+        const importeInput = document.getElementById('importe');
+        const anticipoInput = document.getElementById('anticipo');
+        const saldoInput = document.getElementById('saldo');
+        const displayImporte = document.getElementById('displayImporte');
+        const displayAnticipo = document.getElementById('displayAnticipo');
+        const displaySaldo = document.getElementById('displaySaldo');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // REEMPLAZA ESTO CON TU URL DE GOOGLE APPS SCRIPT
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/d/AKfycbyJPdaaTI3TBjT5_7QoAqWWkzc2esD6ENgvmVZ6oYkcnKbKSkBKI0-dZ_3ye5xbecw_CgQ/userweb';
+        // Mostrar/ocultar campos de domicilio
+        tipoEntregaRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (document.querySelector('input[name="tipoEntrega"]:checked').value === 'domicilio') {
+                    domicilioFields.style.display = 'block';
+                } else {
+                    domicilioFields.style.display = 'none';
+                }
+            });
+        });
+
+        // Actualizar saldo automáticamente
+        function updateSaldo() {
+            const importe = parseFloat(importeInput.value) || 0;
+            const anticipo = parseFloat(anticipoInput.value) || 0;
+            const saldo = importe - anticipo;
+
+            saldoInput.value = saldo.toFixed(2);
+            displayImporte.textContent = importe.toFixed(2);
+            displayAnticipo.textContent = anticipo.toFixed(2);
+            displaySaldo.textContent = saldo.toFixed(2);
+        }
+
+        importeInput.addEventListener('input', updateSaldo);
+        anticipoInput.addEventListener('input', updateSaldo);
+
+        // Enviar formulario
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validar que al menos el primer traje tenga datos
+            if (!document.getElementById('saco1').value) {
+                alert('Por favor, completa los datos del primer traje');
+                return;
+            }
+
+            // Validar domicilio si está seleccionado
+            if (document.querySelector('input[name="tipoEntrega"]:checked').value === 'domicilio') {
+                if (!document.getElementById('horarioEntrega').value) {
+                    alert('Por favor, selecciona un horario de entrega');
+                    return;
+                }
+            }
+
+            // Desactivar botón durante el envío
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+
+            // Recopilar datos del formulario
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            try {
+                // Enviar datos a Google Sheets
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Mostrar número de folio
+                    if (result.folio) {
+                        document.getElementById('folioNumber').textContent = result.folio;
+                    }
+                    
+                    // Mostrar mensaje de éxito
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    
+                    // Limpiar formulario después de 3 segundos
+                    setTimeout(() => {
+                        form.reset();
+                        document.getElementById('successMessage').style.display = 'none';
+                        updateSaldo();
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Enviar Formulario';
+                    }, 3000);
+                } else {
+                    throw new Error(result.error || 'Error desconocido');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorText').textContent = error.message;
+                document.getElementById('successMessage').style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Formulario';
+            }
+        });
+
+        // Inicializar
+        updateSaldo();
+    </script>
+</body>
+</html>
