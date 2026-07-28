@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Renta de Trajes - D&C Tuxedos</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx-fJR8P_7dRvQ5d5Q5q5q5q5q5q5q5q5"></script>
     <style>
         * {
             margin: 0;
@@ -79,6 +80,13 @@
             margin-bottom: 15px;
         }
 
+        .row-2col {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
         .form-group {
             display: flex;
             flex-direction: column;
@@ -132,9 +140,26 @@
             color: #0A192F;
             font-size: 16px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #A68A56;
+        }
+
+        .suit-item {
+            background: white;
+            border-left: 3px solid #A68A56;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .suit-item-title {
+            color: #0A192F;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .radio-group {
@@ -159,16 +184,29 @@
             accent-color: #A68A56;
         }
 
-        .hidden {
-            display: none;
-        }
-
         .conditional-fields {
             background: #f0f8ff;
             border-left: 4px solid #A68A56;
             padding: 15px;
             border-radius: 4px;
             margin-top: 15px;
+        }
+
+        #map {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 2px solid #A68A56;
+        }
+
+        .map-info {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
         }
 
         .summary-box {
@@ -330,7 +368,16 @@
 
         textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 80px;
+        }
+
+        .field-label-small {
+            font-size: 11px;
+            color: #666;
+            font-weight: normal;
+            text-transform: none;
+            display: block;
+            margin-top: 4px;
         }
 
         @media (max-width: 768px) {
@@ -345,7 +392,21 @@
             .button-group {
                 flex-direction: column;
             }
+
+            .row-2col {
+                grid-template-columns: 1fr;
+            }
+
+            #map {
+                height: 250px;
+            }
         }
+        .suit-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
     </style>
 </head>
 <body>
@@ -426,8 +487,9 @@
                     <div class="conditional-fields" id="domicilioFields" style="display: none;">
                         <div class="row">
                             <div class="form-group">
-                                <label for="coordenadas">Coordenadas GPS</label>
-                                <input type="text" id="coordenadas" name="coordenadas" placeholder="Ej: 25.8757° N, 97.3964° W">
+                                <label for="coordenadas">Coordenadas GPS (Latitud, Longitud)</label>
+                                <input type="text" id="coordenadas" name="coordenadas" placeholder="Ej: 25.8757, -97.3964" oninput="actualizarMapa()">
+                                <span class="field-label-small">💡 Usa: https://maps.google.com para obtener las coordenadas</span>
                             </div>
                             <div class="form-group">
                                 <label for="horarioEntrega">Horario de Entrega *</label>
@@ -438,6 +500,15 @@
                                 </select>
                             </div>
                         </div>
+
+                        <!-- Mapa Visual -->
+                        <div id="mapContainer" style="display: none;">
+                            <label>📍 Vista previa del domicilio</label>
+                            <div id="map"></div>
+                            <div class="map-info">
+                                Ingresa las coordenadas GPS arriba para ver la ubicación en el mapa
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -446,23 +517,82 @@
                     <h2 class="section-title">Primer Traje</h2>
                     <div class="suit-section">
                         <div class="suit-title">Especificaciones - Traje 1</div>
-                        <div class="row">
-                            <div class="form-group">
-                                <label for="saco1">Saco (Talla / Ajuste Manga) *</label>
-                                <input type="text" id="saco1" name="saco1" placeholder="Ej: M / Manga 76cm" required>
+                        
+                        <!-- NUEVO: TIPO DE TRAJE -->
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="tipoTraje1">Tipo de Traje *</label>
+                            <input type="text" id="tipoTraje1" name="tipoTraje1" placeholder="Ej: Casual Negro" required>
+                        </div>
+
+                        <!-- SACO -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="chaqueta-de-sport.png" alt="Saco" class="suit-icon"> Saco
                             </div>
-                            <div class="form-group">
-                                <label for="pantalon1">Pantalón (Largo) *</label>
-                                <input type="text" id="pantalon1" name="pantalon1" placeholder="Ej: 90cm" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="camisa1">Camisa (Talla) *</label>
-                                <input type="text" id="camisa1" name="camisa1" placeholder="Ej: 16.5" required>
+                            <div class="row-2col">
+                                <div class="form-group">
+                                    <label for="sacoTalla1">Talla del Saco *</label>
+                                    <input type="text" id="sacoTalla1" name="sacoTalla1" placeholder="Ej: 40" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sacoManga1">Manga (M:) *</label>
+                                    <input type="text" id="sacoManga1" name="sacoManga1" placeholder="Ej: 76cm" required>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
+
+                        <!-- PANTALÓN -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="pantalones-de-entrenamiento.png" alt="Pantalón" class="suit-icon"> Pantalón
+                            </div>
+                            <div class="row-2col">
+                                <div class="form-group">
+                                    <label for="pantalonTalla1">Talla del Pantalón *</label>
+                                    <input type="text" id="pantalonTalla1" name="pantalonTalla1" placeholder="Ej: 34" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pantalonLargo1">Largo (L:) *</label>
+                                    <input type="text" id="pantalonLargo1" name="pantalonLargo1" placeholder="Ej: 90cm" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CAMISA -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="camisa-manga-larga.png" alt="Camisa" class="suit-icon"> Camisa
+                            </div>
+                            <div class="row-2col">
+                                <div class="form-group">
+                                    <label for="camisaTalla1">Talla de Camisa *</label>
+                                    <input type="text" id="camisaTalla1" name="camisaTalla1" placeholder="Ej: M, L, XL" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="camisaCuello1">Cuello (C:) *</label>
+                                    <input type="text" id="camisaCuello1" name="camisaCuello1" placeholder="Ej: 16.5" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CALZADO -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="zapato-inteligente.png" alt="Calzado" class="suit-icon"> Calzado (Opcional)
+                            </div>
                             <div class="form-group">
-                                <label for="accesorios1">Accesorios (Corbata, Pañuelo, etc.)</label>
+                                <label for="calzado1">Talla de Zapatos</label>
+                                <input type="text" id="calzado1" name="calzado1" placeholder="Ej: Talla 42">
+                            </div>
+                        </div>
+
+                        <!-- ACCESORIOS -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="atar.png" alt="Accesorios" class="suit-icon"> Accesorios (Opcional)
+                            </div>
+                            <div class="form-group">
+                                <label for="accesorios1">Corbata, Pañuelo, Cinturón, etc.</label>
                                 <textarea id="accesorios1" name="accesorios1" placeholder="Especificar accesorios requeridos"></textarea>
                             </div>
                         </div>
@@ -474,23 +604,82 @@
                     <h2 class="section-title">Segundo Traje (Opcional)</h2>
                     <div class="suit-section">
                         <div class="suit-title">Especificaciones - Traje 2</div>
-                        <div class="row">
-                            <div class="form-group">
-                                <label for="saco2">Saco (Talla / Ajuste Manga)</label>
-                                <input type="text" id="saco2" name="saco2" placeholder="Ej: M / Manga 76cm">
+                        
+                        <!-- NUEVO: TIPO DE TRAJE 2 -->
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="tipoTraje2">Tipo de Traje</label>
+                            <input type="text" id="tipoTraje2" name="tipoTraje2" placeholder="Ej: Casual Negro">
+                        </div>
+                        
+                        <!-- SACO -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="chaqueta-de-sport.png" alt="Saco" class="suit-icon"> Saco
                             </div>
-                            <div class="form-group">
-                                <label for="pantalon2">Pantalón (Largo)</label>
-                                <input type="text" id="pantalon2" name="pantalon2" placeholder="Ej: 90cm">
-                            </div>
-                            <div class="form-group">
-                                <label for="camisa2">Camisa (Talla)</label>
-                                <input type="text" id="camisa2" name="camisa2" placeholder="Ej: 16.5">
+                            <div class="row-2col">
+                                <div class="form-group">
+                                    <label for="sacoTalla2">Talla del Saco</label>
+                                    <input type="text" id="sacoTalla2" name="sacoTalla2" placeholder="Ej: 40">
+                                </div>
+                                <div class="form-group">
+                                    <label for="sacoManga2">Manga (M:)</label>
+                                    <input type="text" id="sacoManga2" name="sacoManga2" placeholder="Ej: 76cm">
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
+
+                        <!-- PANTALÓN -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="pantalones-de-entrenamiento.png" alt="Pantalón" class="suit-icon"> Pantalón
+                            </div>
+                            <div class="row-2col">
+                                <div class="form-group">
+                                    <label for="pantalonTalla2">Talla del Pantalón</label>
+                                    <input type="text" id="pantalonTalla2" name="pantalonTalla2" placeholder="Ej: 34">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pantalonLargo2">Largo (L:)</label>
+                                    <input type="text" id="pantalonLargo2" name="pantalonLargo2" placeholder="Ej: 90cm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CAMISA -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="camisa-manga-larga.png" alt="Camisa" class="suit-icon"> Camisa
+                            </div>
+                            <div class="row-2col">
+                                <div class="form-group">
+                                    <label for="camisaTalla2">Talla de Camisa</label>
+                                    <input type="text" id="camisaTalla2" name="camisaTalla2" placeholder="Ej: M, L, XL">
+                                </div>
+                                <div class="form-group">
+                                    <label for="camisaCuello2">Cuello (C:)</label>
+                                    <input type="text" id="camisaCuello2" name="camisaCuello2" placeholder="Ej: 16.5">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CALZADO -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="zapato-inteligente.png" alt="Calzado" class="suit-icon"> Calzado (Opcional)
+                            </div>
                             <div class="form-group">
-                                <label for="accesorios2">Accesorios (Corbata, Pañuelo, etc.)</label>
+                                <label for="calzado2">Talla de Zapatos</label>
+                                <input type="text" id="calzado2" name="calzado2" placeholder="Ej: Talla 42">
+                            </div>
+                        </div>
+
+                        <!-- ACCESORIOS -->
+                        <div class="suit-item">
+                            <div class="suit-item-title">
+                                <img src="atar.png" alt="Accesorios" class="suit-icon"> Accesorios (Opcional)
+                            </div>
+                            <div class="form-group">
+                                <label for="accesorios2">Corbata, Pañuelo, Cinturón, etc.</label>
                                 <textarea id="accesorios2" name="accesorios2" placeholder="Especificar accesorios requeridos"></textarea>
                             </div>
                         </div>
@@ -584,9 +773,12 @@
     </div>
 
     <script>
+        let map = null;
         const form = document.getElementById('rentForm');
         const tipoEntregaRadios = document.querySelectorAll('input[name="tipoEntrega"]');
         const domicilioFields = document.getElementById('domicilioFields');
+        const coordenadasInput = document.getElementById('coordenadas');
+        const mapContainer = document.getElementById('mapContainer');
         const importeInput = document.getElementById('importe');
         const anticipoInput = document.getElementById('anticipo');
         const saldoInput = document.getElementById('saldo');
@@ -597,16 +789,71 @@
 
         // REEMPLAZA ESTO CON TU URL DE GOOGLE APPS SCRIPT
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/d/AKfycbyJPdaaTI3TBjT5_7QoAqWWkzc2esD6ENgvmVZ6oYkcnKbKSkBKI0-dZ_3ye5xbecw_CgQ/userweb';
+
         // Mostrar/ocultar campos de domicilio
         tipoEntregaRadios.forEach(radio => {
             radio.addEventListener('change', () => {
                 if (document.querySelector('input[name="tipoEntrega"]:checked').value === 'domicilio') {
                     domicilioFields.style.display = 'block';
+                    if (!map) {
+                        inicializarMapa();
+                    }
                 } else {
                     domicilioFields.style.display = 'none';
+                    mapContainer.style.display = 'none';
                 }
             });
         });
+
+        // Inicializar mapa
+        function inicializarMapa() {
+            const mapElement = document.getElementById('map');
+            const defaultLocation = { lat: 25.6866, lng: -100.3161 };
+            
+            map = new google.maps.Map(mapElement, {
+                zoom: 15,
+                center: defaultLocation
+            });
+
+            new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                title: 'Ubicación de entrega'
+            });
+        }
+
+        // Actualizar mapa con coordenadas
+        function actualizarMapa() {
+            const coordenadas = coordenadasInput.value;
+            
+            if (!coordenadas.trim()) {
+                mapContainer.style.display = 'none';
+                return;
+            }
+
+            mapContainer.style.display = 'block';
+
+            const parts = coordenadas.split(',');
+            if (parts.length === 2) {
+                const lat = parseFloat(parts[0].trim());
+                const lng = parseFloat(parts[1].trim());
+
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const location = { lat: lat, lng: lng };
+                    
+                    if (map) {
+                        map.setCenter(location);
+                        map.setZoom(16);
+                        
+                        new google.maps.Marker({
+                            position: location,
+                            map: map,
+                            title: 'Ubicación de entrega'
+                        });
+                    }
+                }
+            }
+        }
 
         // Actualizar saldo automáticamente
         function updateSaldo() {
@@ -627,13 +874,11 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Validar que al menos el primer traje tenga datos
-            if (!document.getElementById('saco1').value) {
+            if (!document.getElementById('sacoTalla1').value) {
                 alert('Por favor, completa los datos del primer traje');
                 return;
             }
 
-            // Validar domicilio si está seleccionado
             if (document.querySelector('input[name="tipoEntrega"]:checked').value === 'domicilio') {
                 if (!document.getElementById('horarioEntrega').value) {
                     alert('Por favor, selecciona un horario de entrega');
@@ -641,16 +886,13 @@
                 }
             }
 
-            // Desactivar botón durante el envío
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
 
-            // Recopilar datos del formulario
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
 
             try {
-                // Enviar datos a Google Sheets
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     body: JSON.stringify(data),
@@ -662,16 +904,13 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Mostrar número de folio
                     if (result.folio) {
                         document.getElementById('folioNumber').textContent = result.folio;
                     }
                     
-                    // Mostrar mensaje de éxito
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
                     
-                    // Limpiar formulario después de 3 segundos
                     setTimeout(() => {
                         form.reset();
                         document.getElementById('successMessage').style.display = 'none';
@@ -692,7 +931,6 @@
             }
         });
 
-        // Inicializar
         updateSaldo();
     </script>
 </body>
