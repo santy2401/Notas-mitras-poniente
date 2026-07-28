@@ -897,10 +897,12 @@
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
-        // CAMBIO AQUÍ PARA EVITAR ERRORES DE CORS
         'Content-Type': 'text/plain;charset=utf-8' 
-    }
+    },
+    // AGREGA ESTA LÍNEA PARA SEGUIR LAS REDIRECCIONES DE GOOGLE
+    redirect: 'follow'
 });
+               
 
                 const result = await response.json();
                 
