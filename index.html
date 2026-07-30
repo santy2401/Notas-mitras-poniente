@@ -892,33 +892,33 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
             try {
-                // CAMBIAMOS redirect: 'follow' por redirect: 'none' o lo omitimos usando no-cors
+                // Enviar como text/plain evita el bloqueo preflight de CORS
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     body: JSON.stringify(data),
-                    // Usamos form-urlencoded que es más amigable con Apps Script
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                        'Content-Type': 'text/plain;charset=utf-8'
                     }
                 });
 
-                // Google Apps Script a veces no devuelve un JSON limpio por el CORS
-                // Así que asumimos el éxito si la petición no lanza un error de red fatal
+                const result = await response.json();
                 
-                // Generamos un folio localmente para mostrarlo (ya que no podemos leer la respuesta de Google)
-                const folioLocal = "DCT-" + Math.floor(Math.random() * 100000);
-                
-                document.getElementById('folioNumber').textContent = folioLocal;
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('errorMessage').style.display = 'none';
-                
-                setTimeout(() => {
-                    form.reset();
-                    document.getElementById('successMessage').style.display = 'none';
-                    updateSaldo();
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Enviar Formulario';
-                }, 3000);
+                if (result.status === 'success') {
+                    // Ahora recibe el folio REAL calculado por Google Sheets
+                    document.getElementById('folioNumber').textContent = result.folio;
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    
+                    setTimeout(() => {
+                        form.reset();
+                        document.getElementById('successMessage').style.display = 'none';
+                        updateSaldo();
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Enviar Formulario';
+                    }, 4000);
+                } else {
+                    throw new Error(result.message || "Error al registrar");
+                }
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -928,7 +928,6 @@
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Enviar Formulario';
             }
-
         });
 
         updateSaldo();
