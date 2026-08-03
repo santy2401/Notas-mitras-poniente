@@ -903,7 +903,7 @@
 
                 const result = await response.json();
                 
-                if (result.status === 'success') {
+                    if (result && result.status === 'success') {
                     // Ahora recibe el folio REAL calculado por Google Sheets
                     document.getElementById('folioNumber').textContent = result.folio;
                     document.getElementById('successMessage').style.display = 'block';
