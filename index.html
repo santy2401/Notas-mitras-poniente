@@ -402,11 +402,11 @@
             }
         }
         .suit-icon {
-    width: 24px;
-    height: 24px;
-    vertical-align: middle;
-    margin-right: 8px;
-}
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -429,6 +429,16 @@
                 <!-- DATOS DEL CLIENTE -->
                 <div class="section">
                     <h2 class="section-title">Información del Cliente</h2>
+                    
+                    <!-- NUEVO CAMPO: FOLIO MANUAL -->
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="folioManual">Folio Manual (Opcional)</label>
+                            <input type="text" id="folioManual" name="folioManual" placeholder="Ej: 3714">
+                            <span class="field-label-small">Dejar en blanco para generar folio automático</span>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="form-group">
                             <label for="nombre">Nombre Completo *</label>
@@ -518,10 +528,9 @@
                     <div class="suit-section">
                         <div class="suit-title">Especificaciones - Traje 1</div>
                         
-                        <!-- NUEVO: TIPO DE TRAJE -->
                         <div class="form-group" style="margin-bottom: 20px;">
-                            <label for="tipoTraje1">Tipo de Traje *</label>
-                            <input type="text" id="tipoTraje1" name="tipoTraje1" placeholder="Ej: Casual Negro" required>
+                            <label for="tipoTraje1">Tipo de Traje (Opcional)</label>
+                            <input type="text" id="tipoTraje1" name="tipoTraje1" placeholder="Ej: Casual Negro">
                         </div>
 
                         <!-- SACO -->
@@ -529,15 +538,9 @@
                             <div class="suit-item-title">
                                 <img src="chaqueta-de-sport.png" alt="Saco" class="suit-icon"> Saco
                             </div>
-                            <div class="row-2col">
-                                <div class="form-group">
-                                    <label for="sacoTalla1">Talla del Saco *</label>
-                                    <input type="text" id="sacoTalla1" name="sacoTalla1" placeholder="Ej: 40" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="sacoManga1">Manga (M:) *</label>
-                                    <input type="text" id="sacoManga1" name="sacoManga1" placeholder="Ej: 76cm" required>
-                                </div>
+                            <div class="form-group">
+                                <label for="sacoTalla1">Talla del Saco (Opcional)</label>
+                                <input type="text" id="sacoTalla1" name="sacoTalla1" placeholder="Ej: 40">
                             </div>
                         </div>
 
@@ -546,15 +549,9 @@
                             <div class="suit-item-title">
                                 <img src="pantalones-de-entrenamiento.png" alt="Pantalón" class="suit-icon"> Pantalón
                             </div>
-                            <div class="row-2col">
-                                <div class="form-group">
-                                    <label for="pantalonTalla1">Talla del Pantalón *</label>
-                                    <input type="text" id="pantalonTalla1" name="pantalonTalla1" placeholder="Ej: 34" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="pantalonLargo1">Largo (L:) *</label>
-                                    <input type="text" id="pantalonLargo1" name="pantalonLargo1" placeholder="Ej: 90cm" required>
-                                </div>
+                            <div class="form-group">
+                                <label for="pantalonTalla1">Talla del Pantalón (Opcional)</label>
+                                <input type="text" id="pantalonTalla1" name="pantalonTalla1" placeholder="Ej: 34">
                             </div>
                         </div>
 
@@ -563,37 +560,20 @@
                             <div class="suit-item-title">
                                 <img src="camisa-manga-larga.png" alt="Camisa" class="suit-icon"> Camisa
                             </div>
-                            <div class="row-2col">
-                                <div class="form-group">
-                                    <label for="camisaTalla1">Talla de Camisa *</label>
-                                    <input type="text" id="camisaTalla1" name="camisaTalla1" placeholder="Ej: M, L, XL" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="camisaCuello1">Cuello (C:) *</label>
-                                    <input type="text" id="camisaCuello1" name="camisaCuello1" placeholder="Ej: 16.5" required>
-                                </div>
+                            <div class="form-group">
+                                <label for="camisaTalla1">Talla de Camisa (Opcional)</label>
+                                <input type="text" id="camisaTalla1" name="camisaTalla1" placeholder="Ej: M, L, XL">
                             </div>
                         </div>
 
                         <!-- CALZADO -->
                         <div class="suit-item">
                             <div class="suit-item-title">
-                                <img src="zapato-inteligente.png" alt="Calzado" class="suit-icon"> Calzado (Opcional)
+                                <img src="zapato-inteligente.png" alt="Calzado" class="suit-icon"> Calzado
                             </div>
                             <div class="form-group">
-                                <label for="calzado1">Talla de Zapatos</label>
+                                <label for="calzado1">Talla de Zapatos (Opcional)</label>
                                 <input type="text" id="calzado1" name="calzado1" placeholder="Ej: Talla 42">
-                            </div>
-                        </div>
-
-                        <!-- ACCESORIOS -->
-                        <div class="suit-item">
-                            <div class="suit-item-title">
-                                <img src="atar.png" alt="Accesorios" class="suit-icon"> Accesorios (Opcional)
-                            </div>
-                            <div class="form-group">
-                                <label for="accesorios1">Corbata, Pañuelo, Cinturón, etc.</label>
-                                <textarea id="accesorios1" name="accesorios1" placeholder="Especificar accesorios requeridos"></textarea>
                             </div>
                         </div>
                     </div>
@@ -605,7 +585,6 @@
                     <div class="suit-section">
                         <div class="suit-title">Especificaciones - Traje 2</div>
                         
-                        <!-- NUEVO: TIPO DE TRAJE 2 -->
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label for="tipoTraje2">Tipo de Traje</label>
                             <input type="text" id="tipoTraje2" name="tipoTraje2" placeholder="Ej: Casual Negro">
@@ -616,15 +595,9 @@
                             <div class="suit-item-title">
                                 <img src="chaqueta-de-sport.png" alt="Saco" class="suit-icon"> Saco
                             </div>
-                            <div class="row-2col">
-                                <div class="form-group">
-                                    <label for="sacoTalla2">Talla del Saco</label>
-                                    <input type="text" id="sacoTalla2" name="sacoTalla2" placeholder="Ej: 40">
-                                </div>
-                                <div class="form-group">
-                                    <label for="sacoManga2">Manga (M:)</label>
-                                    <input type="text" id="sacoManga2" name="sacoManga2" placeholder="Ej: 76cm">
-                                </div>
+                            <div class="form-group">
+                                <label for="sacoTalla2">Talla del Saco</label>
+                                <input type="text" id="sacoTalla2" name="sacoTalla2" placeholder="Ej: 40">
                             </div>
                         </div>
 
@@ -633,15 +606,9 @@
                             <div class="suit-item-title">
                                 <img src="pantalones-de-entrenamiento.png" alt="Pantalón" class="suit-icon"> Pantalón
                             </div>
-                            <div class="row-2col">
-                                <div class="form-group">
-                                    <label for="pantalonTalla2">Talla del Pantalón</label>
-                                    <input type="text" id="pantalonTalla2" name="pantalonTalla2" placeholder="Ej: 34">
-                                </div>
-                                <div class="form-group">
-                                    <label for="pantalonLargo2">Largo (L:)</label>
-                                    <input type="text" id="pantalonLargo2" name="pantalonLargo2" placeholder="Ej: 90cm">
-                                </div>
+                            <div class="form-group">
+                                <label for="pantalonTalla2">Talla del Pantalón</label>
+                                <input type="text" id="pantalonTalla2" name="pantalonTalla2" placeholder="Ej: 34">
                             </div>
                         </div>
 
@@ -650,37 +617,20 @@
                             <div class="suit-item-title">
                                 <img src="camisa-manga-larga.png" alt="Camisa" class="suit-icon"> Camisa
                             </div>
-                            <div class="row-2col">
-                                <div class="form-group">
-                                    <label for="camisaTalla2">Talla de Camisa</label>
-                                    <input type="text" id="camisaTalla2" name="camisaTalla2" placeholder="Ej: M, L, XL">
-                                </div>
-                                <div class="form-group">
-                                    <label for="camisaCuello2">Cuello (C:)</label>
-                                    <input type="text" id="camisaCuello2" name="camisaCuello2" placeholder="Ej: 16.5">
-                                </div>
+                            <div class="form-group">
+                                <label for="camisaTalla2">Talla de Camisa</label>
+                                <input type="text" id="camisaTalla2" name="camisaTalla2" placeholder="Ej: M, L, XL">
                             </div>
                         </div>
 
                         <!-- CALZADO -->
                         <div class="suit-item">
                             <div class="suit-item-title">
-                                <img src="zapato-inteligente.png" alt="Calzado" class="suit-icon"> Calzado (Opcional)
+                                <img src="zapato-inteligente.png" alt="Calzado" class="suit-icon"> Calzado
                             </div>
                             <div class="form-group">
                                 <label for="calzado2">Talla de Zapatos</label>
                                 <input type="text" id="calzado2" name="calzado2" placeholder="Ej: Talla 42">
-                            </div>
-                        </div>
-
-                        <!-- ACCESORIOS -->
-                        <div class="suit-item">
-                            <div class="suit-item-title">
-                                <img src="atar.png" alt="Accesorios" class="suit-icon"> Accesorios (Opcional)
-                            </div>
-                            <div class="form-group">
-                                <label for="accesorios2">Corbata, Pañuelo, Cinturón, etc.</label>
-                                <textarea id="accesorios2" name="accesorios2" placeholder="Especificar accesorios requeridos"></textarea>
                             </div>
                         </div>
                     </div>
@@ -749,20 +699,20 @@
                     </div>
                 </div>
 
-                <!-- FIRMA -->
-                 <!-- MÉTODO DE PAGO (NUEVO) -->
-<div class="section">
-    <h2 class="section-title">Método de Pago</h2>
-    <div class="form-group">
-        <label for="metodoPago">Método de Pago *</label>
-        <select id="metodoPago" name="metodoPago" required>
-            <option value="">Seleccionar método</option>
-            <option value="Efectivo">Efectivo</option>
-            <option value="Tarjeta">Tarjeta</option>
-            <option value="Transferencia">Transferencia</option>
-        </select>
-    </div>
-</div>
+                <!-- FIRMA / MÉTODO PAGO -->
+                <div class="section">
+                    <h2 class="section-title">Método de Pago</h2>
+                    <div class="form-group">
+                        <label for="metodoPago">Método de Pago *</label>
+                        <select id="metodoPago" name="metodoPago" required>
+                            <option value="">Seleccionar método</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="section">
                     <h2 class="section-title">Conformidad del Cliente</h2>
                     <div class="signature-section">
@@ -887,11 +837,7 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (!document.getElementById('sacoTalla1').value) {
-                alert('Por favor, completa los datos del primer traje');
-                return;
-            }
-
+            // Validación de horario solo si es a domicilio
             if (document.querySelector('input[name="tipoEntrega"]:checked').value === 'domicilio') {
                 if (!document.getElementById('horarioEntrega').value) {
                     alert('Por favor, selecciona un horario de entrega');
@@ -917,7 +863,6 @@
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    // Ahora recibe el folio REAL calculado por Google Sheets
                     document.getElementById('folioNumber').textContent = result.folio;
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
