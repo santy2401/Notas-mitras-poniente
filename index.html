@@ -617,14 +617,15 @@
                                 <option value="Transferencia">Transferencia</option>
                             </select>
                         </div>
+                        <!-- NUEVO CAMPO DE COLABORADOR -->
                         <div class="form-group">
                             <label for="colaborador">Colaborador *</label>
                             <select id="colaborador" name="colaborador" required>
                                 <option value="">Seleccionar colaborador</option>
-                                <option value="Julio">Julio</option>
-                                <option value="Missael">Missael</option>
-                                <option value="Santy">Santy</option>
-                                <option value="Otro">Otro</option>
+                                <option value="Abril">Abril</option>
+                                <option value="Misael">Misael</option>
+                                <option value="Santiago">Santiago</option>
+                                <option value="Jesus">Jesus</option>
                             </select>
                         </div>
                     </div>
@@ -722,13 +723,12 @@
                     
                     const saldoFinal = (parseFloat(data.importe || 0) - parseFloat(data.anticipo || 0)).toFixed(2);
                     
-                    // LÓGICA DE WHATSAPP ACTUALIZADA CON EL NUEVO ORDEN DE FECHAS
                     let texto = `*D&C TUXEDOS - NOTA DE RENTA*\n\n`;
                     texto += `Hola *${data.nombre}*, gracias por tu preferencia. Aquí tienes el resumen de tu renta:\n\n`;
                     texto += `📄 *Folio:* ${result.folio}\n`;
-                    texto += `🚚 *Fecha de Entrega:* ${data.fechaEntrega}\n`;
                     texto += `📅 *Fecha del Evento:* ${data.fechaEvento}\n`;
-                    texto += `↩️ *Fecha de Devolución:* ${data.fechaDevolucion}\n\n`;
+                    texto += `🚚 *Fecha de Entrega:* ${data.fechaEntrega}\n`;
+                    texto += `↩ *Fecha de Devolución:* ${data.fechaDevolucion}\n\n`;
                     texto += `*RESUMEN DE PAGOS:*\n`;
                     texto += `💵 *Total:* $${parseFloat(data.importe).toFixed(2)}\n`;
                     texto += `💳 *Anticipo:* $${parseFloat(data.anticipo).toFixed(2)}\n`;
