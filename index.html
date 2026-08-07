@@ -8,6 +8,9 @@
     <!-- ICONO DE LA PESTAÑA DEL NAVEGADOR -->
     <link rel="icon" href="logo_dyc-removebg-preview.png" type="image/png">
     
+    <!-- LIBRERÍA PARA GENERAR PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
         /* ESTILO TIPO APPLE / MINIMALISTA */
         :root {
@@ -95,6 +98,13 @@
         .row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .row-2col {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -262,6 +272,7 @@
             background: #e5e5ea;
         }
 
+        /* BURBUJA FLOTANTE (MODAL / POPUP) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -317,6 +328,7 @@
             margin-bottom: 25px;
         }
 
+        /* Botón de WhatsApp */
         .btn-whatsapp {
             background-color: #25D366;
             color: white;
@@ -325,7 +337,7 @@
             align-items: center;
             justify-content: center;
             padding: 16px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .btn-whatsapp img {
@@ -336,6 +348,23 @@
 
         .btn-whatsapp:hover {
             background-color: #20BA56;
+            transform: translateY(-2px);
+        }
+
+        /* Botón de PDF */
+        .btn-pdf {
+            background-color: var(--apple-blue);
+            color: white;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .btn-pdf:hover {
+            background-color: #0062cc;
             transform: translateY(-2px);
         }
 
@@ -378,6 +407,7 @@
 </head>
 <body>
 
+    <!-- BURBUJA DE ÉXITO (MODAL) -->
     <div class="modal-overlay" id="successModal">
         <div class="modal-content">
             <div class="modal-icon">✅</div>
@@ -387,6 +417,11 @@
             <button type="button" id="btnWhatsapp" class="btn-whatsapp">
                 <img src="whatsapp.png" alt="WhatsApp"> 
                 Enviar Nota por WhatsApp
+            </button>
+
+            <!-- NUEVO BOTÓN DE PDF -->
+            <button type="button" id="btnPdf" class="btn-pdf">
+                📄 Descargar Nota en PDF
             </button>
             
             <button type="button" class="btn-close-modal" onclick="closeModal()">Cerrar y Nueva Renta</button>
@@ -482,6 +517,13 @@
                                     <option value="12:00pm-4:00pm">12:00 PM - 4:00 PM</option>
                                     <option value="5:00pm-8:00pm">5:00 PM - 8:00 PM</option>
                                 </select>
+                            </div>
+                        </div>
+                        <!-- CAMPO DE ENTRECALLES (SOLO PARA WHATSAPP / PDF) -->
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="entrecalles">Entrecalles (Opcional)</label>
+                                <input type="text" id="entrecalles" name="entrecalles" placeholder="Ej: Calle Principal y Avenida Secundaria">
                             </div>
                         </div>
                     </div>
@@ -604,7 +646,6 @@
                     </div>
                 </div>
 
-                <!-- MÉTODO PAGO Y COLABORADOR -->
                 <div class="section">
                     <h2 class="section-title">Datos de Cierre</h2>
                     <div class="row-2col">
@@ -617,7 +658,6 @@
                                 <option value="Transferencia">Transferencia</option>
                             </select>
                         </div>
-                        <!-- NUEVO CAMPO DE COLABORADOR -->
                         <div class="form-group">
                             <label for="colaborador">Colaborador *</label>
                             <select id="colaborador" name="colaborador" required>
@@ -703,10 +743,14 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
             
+            // Creamos una copia de la data para enviarla a Google Sheets SIN el campo 'entrecalles'
+            const dataToSheets = { ...data };
+            delete dataToSheets.entrecalles;
+            
             try {
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(dataToSheets),
                     headers: {
                         'Content-Type': 'text/plain;charset=utf-8'
                     }
@@ -723,12 +767,19 @@
                     
                     const saldoFinal = (parseFloat(data.importe || 0) - parseFloat(data.anticipo || 0)).toFixed(2);
                     
+                    // --- LÓGICA DE WHATSAPP ---
                     let texto = `*D&C TUXEDOS - NOTA DE RENTA*\n\n`;
                     texto += `Hola *${data.nombre}*, gracias por tu preferencia. Aquí tienes el resumen de tu renta:\n\n`;
                     texto += `📄 *Folio:* ${result.folio}\n`;
-                    texto += `📅 *Fecha del Evento:* ${data.fechaEvento}\n`;
+                    
+                    if (data.tipoEntrega === 'domicilio' && data.entrecalles) {
+                         texto += `📍 *Dirección:* ${data.direccion}, ${data.ciudad}\n`;
+                         texto += `🚦 *Entrecalles:* ${data.entrecalles}\n`;
+                    }
+
                     texto += `🚚 *Fecha de Entrega:* ${data.fechaEntrega}\n`;
-                    texto += `↩ *Fecha de Devolución:* ${data.fechaDevolucion}\n\n`;
+                    texto += `📅 *Fecha del Evento:* ${data.fechaEvento}\n`;
+                    texto += `↩️ *Fecha de Devolución:* ${data.fechaDevolucion}\n\n`;
                     texto += `*RESUMEN DE PAGOS:*\n`;
                     texto += `💵 *Total:* $${parseFloat(data.importe).toFixed(2)}\n`;
                     texto += `💳 *Anticipo:* $${parseFloat(data.anticipo).toFixed(2)}\n`;
@@ -740,6 +791,110 @@
                         window.open(`https://wa.me/${telefonoFinal}?text=${encodeURIComponent(texto)}`, '_blank');
                     };
 
+                    // --- LÓGICA DEL PDF (NUEVO) ---
+                    document.getElementById('btnPdf').onclick = function() {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+                        
+                        // Diseño del Encabezado
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(22);
+                        doc.setTextColor(29, 29, 31);
+                        doc.text("D&C TUXEDOS", 105, 25, null, null, "center");
+                        
+                        doc.setFontSize(14);
+                        doc.setTextColor(166, 138, 86); // Dorado
+                        doc.text("NOTA DE RENTA", 105, 33, null, null, "center");
+
+                        doc.setDrawColor(200, 200, 200);
+                        doc.line(20, 40, 190, 40);
+
+                        doc.setTextColor(29, 29, 31);
+                        let y = 50;
+                        const leftCol = 20;
+                        const rightCol = 120;
+                        const lineHeight = 8;
+
+                        // Folio y Fechas
+                        doc.setFontSize(11);
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`Folio: ${result.folio}`, leftCol, y);
+                        doc.setFont("helvetica", "normal");
+                        doc.text(`Fecha de emisión: ${new Date().toLocaleDateString('es-MX')}`, rightCol, y);
+                        y += lineHeight * 2;
+
+                        // Cliente
+                        doc.setFont("helvetica", "bold");
+                        doc.text("INFORMACIÓN DEL CLIENTE", leftCol, y);
+                        doc.setFont("helvetica", "normal");
+                        y += lineHeight;
+                        doc.text(`Nombre: ${data.nombre}`, leftCol, y); y += lineHeight;
+                        doc.text(`Teléfono: ${data.telefono}`, leftCol, y); y += lineHeight;
+                        doc.text(`Dirección: ${data.direccion}, ${data.ciudad}`, leftCol, y); y += lineHeight;
+                        if (data.tipoEntrega === 'domicilio' && data.entrecalles) {
+                            doc.text(`Entrecalles: ${data.entrecalles}`, leftCol, y); y += lineHeight;
+                        }
+                        y += lineHeight;
+
+                        // Fechas
+                        doc.setFont("helvetica", "bold");
+                        doc.text("FECHAS PROGRAMADAS", leftCol, y);
+                        doc.setFont("helvetica", "normal");
+                        y += lineHeight;
+                        doc.text(`Entrega: ${data.fechaEntrega}`, leftCol, y);
+                        doc.text(`Evento: ${data.fechaEvento}`, leftCol + 60, y);
+                        doc.text(`Devolución: ${data.fechaDevolucion}`, leftCol + 120, y);
+                        y += lineHeight * 2;
+
+                        // Traje 1
+                        doc.setFont("helvetica", "bold");
+                        doc.text("ESPECIFICACIONES DEL TRAJE 1", leftCol, y);
+                        doc.setFont("helvetica", "normal");
+                        y += lineHeight;
+                        if(data.tipoTraje1) { doc.text(`Tipo: ${data.tipoTraje1}`, leftCol, y); y += lineHeight; }
+                        doc.text(`Saco: ${data.sacoTalla1 || 'N/A'} | Pantalón: ${data.pantalonTalla1 || 'N/A'} | Camisa: ${data.camisaTalla1 || 'N/A'} | Calzado: ${data.calzado1 || 'N/A'}`, leftCol, y);
+                        y += lineHeight * 2;
+
+                        // Traje 2
+                        if(data.sacoTalla2 || data.pantalonTalla2 || data.tipoTraje2) {
+                            doc.setFont("helvetica", "bold");
+                            doc.text("ESPECIFICACIONES DEL TRAJE 2", leftCol, y);
+                            doc.setFont("helvetica", "normal");
+                            y += lineHeight;
+                            if(data.tipoTraje2) { doc.text(`Tipo: ${data.tipoTraje2}`, leftCol, y); y += lineHeight; }
+                            doc.text(`Saco: ${data.sacoTalla2 || 'N/A'} | Pantalón: ${data.pantalonTalla2 || 'N/A'} | Camisa: ${data.camisaTalla2 || 'N/A'} | Calzado: ${data.calzado2 || 'N/A'}`, leftCol, y);
+                            y += lineHeight * 2;
+                        }
+
+                        // Pagos
+                        doc.line(20, y-3, 190, y-3);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("RESUMEN DE PAGOS", leftCol, y + 2);
+                        doc.setFont("helvetica", "normal");
+                        y += lineHeight + 2;
+                        doc.text(`Total: $${parseFloat(data.importe).toFixed(2)}`, leftCol, y);
+                        doc.text(`Anticipo: $${parseFloat(data.anticipo).toFixed(2)}`, leftCol + 60, y);
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`Saldo Pendiente: $${saldoFinal}`, leftCol + 120, y);
+                        doc.setFont("helvetica", "normal");
+                        y += lineHeight * 2;
+
+                        // Extras
+                        doc.text(`Método de Pago: ${data.metodoPago}`, leftCol, y);
+                        doc.text(`Atendido por: ${data.colaborador}`, rightCol, y);
+
+                        // Firma
+                        y += lineHeight * 4;
+                        doc.line(leftCol, y, leftCol + 60, y);
+                        y += 5;
+                        doc.setFontSize(9);
+                        doc.text("Firma de Conformidad del Cliente", leftCol + 6, y);
+
+                        // Comando que activa la descarga en el dispositivo
+                        doc.save(`Nota_D&C_${result.folio}.pdf`);
+                    };
+
+                    // MOSTRAR LA BURBUJA (MODAL)
                     modal.classList.add('active');
                     document.getElementById('errorMessage').style.display = 'none';
                     
