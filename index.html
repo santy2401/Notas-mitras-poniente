@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Renta de Trajes - D&C Tuxedos</title>
     
-    <!-- ICONO DE LA PESTAÑA DEL NAVEGADOR -->
     <link rel="icon" href="logo_dyc-removebg-preview.png" type="image/png">
     
     <!-- LIBRERÍA PARA GENERAR PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* ESTILO TIPO APPLE / MINIMALISTA */
         :root {
             --bg-color: #f5f5f7;
             --card-bg: #ffffff;
@@ -31,7 +29,6 @@
         }
 
         body {
-            /* Fuente nativa de Apple */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -145,6 +142,13 @@
             background-color: #fff;
             border-color: var(--apple-blue);
             box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+
+        /* Color para indicar que el campo es automático pero editable */
+        #folioManual {
+            font-weight: bold;
+            color: var(--apple-blue);
+            background-color: #e6f2ff;
         }
 
         .suit-section {
@@ -272,7 +276,6 @@
             background: #e5e5ea;
         }
 
-        /* BURBUJA FLOTANTE (MODAL / POPUP) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -328,7 +331,6 @@
             margin-bottom: 25px;
         }
 
-        /* Botón de WhatsApp */
         .btn-whatsapp {
             background-color: #25D366;
             color: white;
@@ -351,7 +353,6 @@
             transform: translateY(-2px);
         }
 
-        /* Botón de PDF */
         .btn-pdf {
             background-color: var(--apple-blue);
             color: white;
@@ -407,7 +408,6 @@
 </head>
 <body>
 
-    <!-- BURBUJA DE ÉXITO (MODAL) -->
     <div class="modal-overlay" id="successModal">
         <div class="modal-content">
             <div class="modal-icon">✅</div>
@@ -419,7 +419,6 @@
                 Enviar Nota por WhatsApp
             </button>
 
-            <!-- NUEVO BOTÓN DE PDF -->
             <button type="button" id="btnPdf" class="btn-pdf">
                 📄 Descargar Nota en PDF
             </button>
@@ -446,8 +445,9 @@
                     
                     <div class="row">
                         <div class="form-group">
-                            <label for="folioManual">Folio Manual (Opcional)</label>
-                            <input type="text" id="folioManual" name="folioManual" placeholder="Ej: 3714">
+                            <label for="folioManual">Folio de Renta</label>
+                            <input type="number" id="folioManual" name="folioManual" placeholder="Calculando...">
+                            <span class="field-label-small">El sistema detecta automáticamente el número que sigue en tu hoja. Puedes modificarlo si lo necesitas.</span>
                         </div>
                     </div>
 
@@ -519,7 +519,6 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- CAMPO DE ENTRECALLES (SOLO PARA WHATSAPP / PDF) -->
                         <div class="row">
                             <div class="form-group">
                                 <label for="entrecalles">Entrecalles (Opcional)</label>
@@ -691,9 +690,35 @@
         const displaySaldo = document.getElementById('displaySaldo');
         const submitBtn = document.getElementById('submitBtn');
         const modal = document.getElementById('successModal');
+        const inputFolio = document.getElementById('folioManual');
 
         // REEMPLAZA ESTO CON TU URL DE GOOGLE APPS SCRIPT
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyoOYbjKI5IZxY7AX9pEvKD1CpSncuNrBXzt03fljI4QZvDHgvjH3nBhM0OwXl9lrgp/exec';
+
+        // -------------------------------------------------------------
+        // NUEVA FUNCIÓN: Obtener Folio Automático al cargar la página
+        // -------------------------------------------------------------
+        async function fetchNextFolio() {
+            inputFolio.placeholder = "Calculando...";
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "getFolio" }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    inputFolio.value = result.nextFolio;
+                }
+            } catch (error) {
+                console.error("Error al obtener folio automático:", error);
+                inputFolio.placeholder = "Escribe el folio manual";
+            }
+        }
+
+        // Ejecutar al cargar la página
+        window.addEventListener('DOMContentLoaded', fetchNextFolio);
+        // -------------------------------------------------------------
 
         tipoEntregaRadios.forEach(radio => {
             radio.addEventListener('change', () => {
@@ -724,6 +749,9 @@
             setTimeout(() => {
                 form.reset();
                 updateSaldo();
+                // Volvemos a pedir el folio nuevo para la siguiente renta
+                inputFolio.value = "";
+                fetchNextFolio();
             }, 300);
         }
 
@@ -743,7 +771,6 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
             
-            // Creamos una copia de la data para enviarla a Google Sheets SIN el campo 'entrecalles'
             const dataToSheets = { ...data };
             delete dataToSheets.entrecalles;
             
@@ -751,9 +778,7 @@
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     body: JSON.stringify(dataToSheets),
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    }
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
 
                 const result = await response.json();
@@ -791,19 +816,18 @@
                         window.open(`https://wa.me/${telefonoFinal}?text=${encodeURIComponent(texto)}`, '_blank');
                     };
 
-                    // --- LÓGICA DEL PDF (NUEVO) ---
+                    // --- LÓGICA DEL PDF ---
                     document.getElementById('btnPdf').onclick = function() {
                         const { jsPDF } = window.jspdf;
                         const doc = new jsPDF();
                         
-                        // Diseño del Encabezado
                         doc.setFont("helvetica", "bold");
                         doc.setFontSize(22);
                         doc.setTextColor(29, 29, 31);
                         doc.text("D&C TUXEDOS", 105, 25, null, null, "center");
                         
                         doc.setFontSize(14);
-                        doc.setTextColor(166, 138, 86); // Dorado
+                        doc.setTextColor(166, 138, 86);
                         doc.text("NOTA DE RENTA", 105, 33, null, null, "center");
 
                         doc.setDrawColor(200, 200, 200);
@@ -815,7 +839,6 @@
                         const rightCol = 120;
                         const lineHeight = 8;
 
-                        // Folio y Fechas
                         doc.setFontSize(11);
                         doc.setFont("helvetica", "bold");
                         doc.text(`Folio: ${result.folio}`, leftCol, y);
@@ -823,7 +846,6 @@
                         doc.text(`Fecha de emisión: ${new Date().toLocaleDateString('es-MX')}`, rightCol, y);
                         y += lineHeight * 2;
 
-                        // Cliente
                         doc.setFont("helvetica", "bold");
                         doc.text("INFORMACIÓN DEL CLIENTE", leftCol, y);
                         doc.setFont("helvetica", "normal");
@@ -836,7 +858,6 @@
                         }
                         y += lineHeight;
 
-                        // Fechas
                         doc.setFont("helvetica", "bold");
                         doc.text("FECHAS PROGRAMADAS", leftCol, y);
                         doc.setFont("helvetica", "normal");
@@ -846,7 +867,6 @@
                         doc.text(`Devolución: ${data.fechaDevolucion}`, leftCol + 120, y);
                         y += lineHeight * 2;
 
-                        // Traje 1
                         doc.setFont("helvetica", "bold");
                         doc.text("ESPECIFICACIONES DEL TRAJE 1", leftCol, y);
                         doc.setFont("helvetica", "normal");
@@ -855,7 +875,6 @@
                         doc.text(`Saco: ${data.sacoTalla1 || 'N/A'} | Pantalón: ${data.pantalonTalla1 || 'N/A'} | Camisa: ${data.camisaTalla1 || 'N/A'} | Calzado: ${data.calzado1 || 'N/A'}`, leftCol, y);
                         y += lineHeight * 2;
 
-                        // Traje 2
                         if(data.sacoTalla2 || data.pantalonTalla2 || data.tipoTraje2) {
                             doc.setFont("helvetica", "bold");
                             doc.text("ESPECIFICACIONES DEL TRAJE 2", leftCol, y);
@@ -866,7 +885,6 @@
                             y += lineHeight * 2;
                         }
 
-                        // Pagos
                         doc.line(20, y-3, 190, y-3);
                         doc.setFont("helvetica", "bold");
                         doc.text("RESUMEN DE PAGOS", leftCol, y + 2);
@@ -879,22 +897,18 @@
                         doc.setFont("helvetica", "normal");
                         y += lineHeight * 2;
 
-                        // Extras
                         doc.text(`Método de Pago: ${data.metodoPago}`, leftCol, y);
                         doc.text(`Atendido por: ${data.colaborador}`, rightCol, y);
 
-                        // Firma
                         y += lineHeight * 4;
                         doc.line(leftCol, y, leftCol + 60, y);
                         y += 5;
                         doc.setFontSize(9);
                         doc.text("Firma de Conformidad del Cliente", leftCol + 6, y);
 
-                        // Comando que activa la descarga en el dispositivo
                         doc.save(`Nota_D&C_${result.folio}.pdf`);
                     };
 
-                    // MOSTRAR LA BURBUJA (MODAL)
                     modal.classList.add('active');
                     document.getElementById('errorMessage').style.display = 'none';
                     
@@ -914,7 +928,15 @@
             }
         });
 
-        updateSaldo();
+        // Evento para limpiar el form manualmente y volver a pedir folio
+        form.addEventListener('reset', () => {
+            setTimeout(() => {
+                updateSaldo();
+                inputFolio.value = "";
+                fetchNextFolio();
+            }, 100);
+        });
+
     </script>
 </body>
 </html>
