@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="./logo_dyc.png">
     <link rel="shortcut icon" type="image/png" href="./logo_dyc.png">
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx-fJR8P_7dRvQ5d5Q5q5q5q5q5q5q5q5"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx-fJR8P_7dRvQ5d5Q5q5q5q5q5q5q5q5"></script>
     
     <style>
         * {
@@ -564,7 +564,7 @@
                 <div class="folio-section">
                     <div class="folio-box">
                         <div class="folio-box-title">FOLIO</div>
-                        <div class="folio-box-value" id="folioDisplay">-</div>
+                        <div class="folio-box-value" id="folioDisplay">Cargando...</div>
                     </div>
                     <div class="fecha-box">
                         <div class="fecha-box-title">FECHA</div>
@@ -866,7 +866,7 @@
         <div class="whatsapp-bubble">
             <button class="close-modal" onclick="cerrarWhatsApp()">&times;</button>
             <div class="whatsapp-image">
-                <img src="./whatsapp.png" alt="WhatsApp" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg'">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
             </div>
             <div class="whatsapp-text">
                 <h3>¿Preguntas?</h3>
@@ -884,12 +884,36 @@
         const anticipoInput = document.getElementById('anticipo');
         const saldoInput = document.getElementById('saldo');
         const submitBtn = document.getElementById('submitBtn');
+        const folioDisplay = document.getElementById('folioDisplay');
 
-        // URL DE GOOGLE APPS SCRIPT PARA ESCOBEDO
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw4KHScRB7AgoEq9XXDROM7iqDyihPSUiBjxJxYjRCW6Kx8oXSuI5RWcp87-sWxXKY/exec';
+        // REEMPLAZA ESTA URL CON LA URL OFICIAL GENERADA EN APPS SCRIPT
+        const GOOGLE_SHEETS_URL = 'PEGA_AQUI_TU_NUEVA_URL_DE_IMPLEMENTACION';
 
-        // Actualizar fecha actual
-        document.getElementById('fechaDisplay').textContent = new Date().toLocaleDateString('es-MX');
+        // OBTENER FOLIO AUTOMÁTICO AL CARGAR LA PÁGINA
+        async function fetchNextFolio() {
+            folioDisplay.textContent = "Cargando...";
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "getFolio" }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    folioDisplay.textContent = result.nextFolio;
+                } else {
+                    folioDisplay.textContent = "3106";
+                }
+            } catch (error) {
+                console.error("Error al consultar folio:", error);
+                folioDisplay.textContent = "3106";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('fechaDisplay').textContent = new Date().toLocaleDateString('es-MX');
+            fetchNextFolio();
+        });
 
         tipoEntregaRadios.forEach(radio => {
             radio.addEventListener('change', () => {
@@ -965,7 +989,6 @@
             const data = Object.fromEntries(formData);
 
             try {
-                // AQUÍ ESTÁ EL CAMBIO CLAVE PARA EVITAR EL ERROR DE CORS
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     body: JSON.stringify(data),
@@ -975,8 +998,8 @@
                 const result = await response.json();
                 
                 if (result && result.status === 'success') {
-                    const folio = result.folio || 'DCT-' + Math.floor(Math.random() * 100000);
-                    document.getElementById('folioDisplay').textContent = folio;
+                    const folioFinal = result.folio || folioDisplay.textContent;
+                    folioDisplay.textContent = folioFinal;
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
                     
@@ -990,7 +1013,7 @@
                         updateSaldo();
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'Enviar Formulario';
-                        document.getElementById('folioDisplay').textContent = '-';
+                        fetchNextFolio();
                     }, 5000);
                 } else {
                     throw new Error(result?.message || 'Error desconocido');
