@@ -381,6 +381,18 @@
             background: #d2d2d7;
         }
 
+        .btn-download {
+            background: #28a745;
+            color: white;
+            margin-top: 10px;
+            display: none;
+            width: 100%;
+        }
+
+        .btn-download:hover {
+            background: #218838;
+        }
+
         .success-message, .error-message {
             padding: 14px;
             border-radius: 6px;
@@ -409,7 +421,7 @@
             margin-top: 4px;
         }
 
-        /* MODAL WHATSAPP */
+        /* MODAL WHATSAPP Y DESCARGA */
         .whatsapp-modal {
             display: none;
             position: fixed;
@@ -422,38 +434,20 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
-            animation: fadeIn 0.3s ease;
         }
 
         .whatsapp-modal.active {
             display: flex;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .whatsapp-bubble {
             background: white;
             border-radius: 16px;
             padding: 28px;
-            max-width: 380px;
+            max-width: 400px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
-            animation: slideUp 0.4s ease;
             position: relative;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         .close-modal {
@@ -467,38 +461,6 @@
             color: #86868b;
         }
 
-        .whatsapp-image {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: #25d366;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .whatsapp-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .whatsapp-text h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1d1d1f;
-        }
-
-        .whatsapp-text p {
-            font-size: 15px;
-            color: #86868b;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
         .whatsapp-button {
             background: #25d366;
             color: white;
@@ -508,42 +470,15 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-block;
+            margin-bottom: 10px;
         }
 
-        .whatsapp-button:hover {
-            background: #20ba58;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .header-top {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row, .form-row.three {
-                grid-template-columns: 1fr;
-            }
-
-            .signature-section {
-                grid-template-columns: 1fr;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            #map {
-                height: 200px;
-            }
-
-            .whatsapp-bubble {
-                margin: 20px;
-                max-width: 90%;
-            }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border-radius: 0; max-width: 100%; }
+            .button-group, .whatsapp-modal, .btn-download { display: none !important; }
         }
     </style>
 </head>
@@ -576,6 +511,10 @@
             <div class="success-message" id="successMessage">
                 ✓ Formulario enviado correctamente
             </div>
+
+            <button type="button" class="btn-download" id="downloadBtn" onclick="descargarHojaRenta()">
+                📄 Descargar / Imprimir Comprobante de Renta
+            </button>
 
             <div class="error-message" id="errorMessage">
                 ✗ Error: <span id="errorText"></span>
@@ -760,7 +699,6 @@
                         <div id="mapContainer" style="display: none;">
                             <label>📍 Vista previa del domicilio</label>
                             <div id="map"></div>
-                            <div class="map-info">Ingresa coordenadas para ver la ubicación</div>
                         </div>
                     </div>
                 </div>
@@ -861,23 +799,25 @@
         </div>
     </div>
 
-    <!-- MODAL WHATSAPP -->
+    <!-- MODAL WHATSAPP Y DESCARGA DE COMPROBANTE -->
     <div class="whatsapp-modal" id="whatsappModal">
         <div class="whatsapp-bubble">
             <button class="close-modal" onclick="cerrarWhatsApp()">&times;</button>
-            <div class="whatsapp-image">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-            </div>
-            <div class="whatsapp-text">
-                <h3>¿Preguntas?</h3>
-                <p>Contáctanos por WhatsApp para más información sobre nuestros servicios</p>
-            </div>
-            <a href="https://wa.me/5218134107030" class="whatsapp-button" target="_blank">Enviar Mensaje</a>
+            <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
+            <h3>¡Formulario Guardado!</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 15px;">Tu registro ha sido procesado con éxito.</p>
+            
+            <button type="button" class="whatsapp-button" style="background: #003d7a; width: 100%; margin-bottom: 10px;" onclick="descargarHojaRenta()">
+                📄 Descargar Comprobante (PDF)
+            </button>
+            <br>
+            <a href="https://wa.me/5218134107030" class="whatsapp-button" style="width: 100%;" target="_blank">Enviar Mensaje por WhatsApp</a>
         </div>
     </div>
 
     <script>
         let map = null;
+        let currentFolio = null;
         const form = document.getElementById('rentForm');
         const tipoEntregaRadios = document.querySelectorAll('input[name="tipoEntrega"]');
         const importeInput = document.getElementById('importe');
@@ -885,11 +825,12 @@
         const saldoInput = document.getElementById('saldo');
         const submitBtn = document.getElementById('submitBtn');
         const folioDisplay = document.getElementById('folioDisplay');
+        const downloadBtn = document.getElementById('downloadBtn');
 
-        // REEMPLAZA ESTA URL CON LA URL OFICIAL GENERADA EN APPS SCRIPT
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw4KHScRB7AgoEq9XXDROM7iqDyihPSUiBjxJxYjRCW6Kx8oXSuI5RWcp87-sWxXKY/exec';
+        // COLOCA AQUÍ TU URL DE GOOGLE APPS SCRIPT
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwra3zA2y3M1UkLoP0yb8DLMm2Xlw0nn_eMPe-wee3RLgQJCvV_I2ySJydY3sVUb0MT/exec';
 
-        // OBTENER FOLIO AUTOMÁTICO AL CARGAR LA PÁGINA
+        // CONSULTA Y MUESTRA EL FOLIO EN TIEMPO REAL AL ABRIR LA PÁGINA
         async function fetchNextFolio() {
             folioDisplay.textContent = "Cargando...";
             try {
@@ -899,14 +840,17 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 const result = await response.json();
-                if (result.status === 'success') {
-                    folioDisplay.textContent = result.nextFolio;
+                if (result.status === 'success' && result.nextFolio) {
+                    currentFolio = result.nextFolio;
+                    folioDisplay.textContent = currentFolio;
                 } else {
                     folioDisplay.textContent = "3106";
+                    currentFolio = 3106;
                 }
             } catch (error) {
-                console.error("Error al consultar folio:", error);
+                console.error("Error al obtener folio:", error);
                 folioDisplay.textContent = "3106";
+                currentFolio = 3106;
             }
         }
 
@@ -971,6 +915,10 @@
             document.getElementById('whatsappModal').classList.remove('active');
         }
 
+        function descargarHojaRenta() {
+            window.print();
+        }
+
         importeInput.addEventListener('input', updateSaldo);
         anticipoInput.addEventListener('input', updateSaldo);
 
@@ -987,36 +935,31 @@
 
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
+            data.folioActual = currentFolio;
 
             try {
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     body: JSON.stringify(data),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
 
                 const result = await response.json();
                 
                 if (result && result.status === 'success') {
-                    const folioFinal = result.folio || folioDisplay.textContent;
-                    folioDisplay.textContent = folioFinal;
+                    const folioAsignado = result.folio || currentFolio;
+                    folioDisplay.textContent = folioAsignado;
+                    
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
+                    downloadBtn.style.display = 'block';
                     
-                    setTimeout(() => {
-                        mostrarWhatsApp();
-                    }, 1500);
+                    mostrarWhatsApp();
 
-                    setTimeout(() => {
-                        form.reset();
-                        document.getElementById('successMessage').style.display = 'none';
-                        updateSaldo();
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Enviar Formulario';
-                        fetchNextFolio();
-                    }, 5000);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Enviar Formulario';
                 } else {
-                    throw new Error(result?.message || 'Error desconocido');
+                    throw new Error(result?.message || 'Error al procesar la respuesta');
                 }
             } catch (error) {
                 document.getElementById('errorMessage').style.display = 'block';
