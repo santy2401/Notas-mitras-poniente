@@ -96,7 +96,7 @@
         }
 
         .folio-box-value, .fecha-box-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: #c41e3a;
             min-height: 30px;
@@ -752,15 +752,15 @@
                     <div class="summary-box">
                         <div class="summary-item">
                             <span class="summary-label">Importe:</span>
-                            <span class="summary-value">$ <span id="displayImporte">0.00</span></span>
+                            <span class="summary-value">$<span id="displayImporte">0</span></span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">Anticipo:</span>
-                            <span class="summary-value">$ <span id="displayAnticipo">0.00</span></span>
+                            <span class="summary-value">$<span id="displayAnticipo">0</span></span>
                         </div>
                         <div class="summary-item">
                             <span class="summary-label">Saldo:</span>
-                            <span class="summary-value">$ <span id="displaySaldo">0.00</span></span>
+                            <span class="summary-value">$<span id="displaySaldo">0</span></span>
                         </div>
                     </div>
                 </div>
@@ -831,6 +831,30 @@
 
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw4KHScRB7AgoEq9XXDROM7iqDyihPSUiBjxJxYjRCW6Kx8oXSuI5RWcp87-sWxXKY/exec';
 
+        const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+        function formatearFechaTexto(fechaInput) {
+            if (!fechaInput) return '-';
+            if (fechaInput instanceof Date) {
+                return `${fechaInput.getDate()} ${MESES[fechaInput.getMonth()]} ${fechaInput.getFullYear()}`;
+            }
+            const partes = fechaInput.split('-');
+            if (partes.length === 3) {
+                const dia = parseInt(partes[2], 10);
+                const mesIdx = parseInt(partes[1], 10) - 1;
+                const anio = partes[0];
+                return `${dia} ${MESES[mesIdx]} ${anio}`;
+            }
+            return fechaInput;
+        }
+
+        function formatearDinero(monto) {
+            if (monto === undefined || monto === null || monto === '') return '$0';
+            const num = parseFloat(monto);
+            if (isNaN(num)) return `$${monto}`;
+            return `$${num}`;
+        }
+
         async function fetchNextFolio() {
             folioDisplay.textContent = "Cargando...";
             try {
@@ -851,7 +875,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('fechaDisplay').textContent = new Date().toLocaleDateString('es-MX');
+            document.getElementById('fechaDisplay').textContent = formatearFechaTexto(new Date());
             fetchNextFolio();
         });
 
@@ -897,10 +921,10 @@
             const importe = parseFloat(importeInput.value) || 0;
             const anticipo = parseFloat(anticipoInput.value) || 0;
             const saldo = importe - anticipo;
-            saldoInput.value = saldo.toFixed(2);
-            document.getElementById('displayImporte').textContent = importe.toFixed(2);
-            document.getElementById('displayAnticipo').textContent = anticipo.toFixed(2);
-            document.getElementById('displaySaldo').textContent = saldo.toFixed(2);
+            saldoInput.value = saldo;
+            document.getElementById('displayImporte').textContent = importe;
+            document.getElementById('displayAnticipo').textContent = anticipo;
+            document.getElementById('displaySaldo').textContent = saldo;
         }
 
         function mostrarWhatsApp() {
@@ -933,6 +957,14 @@
             const data = Object.fromEntries(formData);
             data.folioActual = currentFolio;
 
+            // Formatear montos y fechas antes de enviar
+            data.importeTexto = formatearDinero(data.importe);
+            data.anticipoTexto = formatearDinero(data.anticipo);
+            data.saldoTexto = formatearDinero(data.saldo);
+            data.fechaEventoTexto = formatearFechaTexto(data.fechaEvento);
+            data.fechaEntregaTexto = formatearFechaTexto(data.fechaEntrega);
+            data.fechaDevolucionTexto = formatearFechaTexto(data.fechaDevolucion);
+
             try {
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
@@ -947,29 +979,32 @@
                     const hojaAsignada = result.hoja || '';
                     folioDisplay.textContent = folioAsignado;
 
-                    // CONSTRUIR EL MENSAJE DETALLADO DE WHATSAPP
-                    const imp = parseFloat(data.importe || 0).toFixed(2);
-                    const ant = parseFloat(data.anticipo || 0).toFixed(2);
-                    const sal = parseFloat(data.saldo || 0).toFixed(2);
+                    const imp = formatearDinero(data.importe);
+                    const ant = formatearDinero(data.anticipo);
+                    const sal = formatearDinero(data.saldo);
+
+                    const fEvento = formatearFechaTexto(data.fechaEvento);
+                    const fEntrega = formatearFechaTexto(data.fechaEntrega);
+                    const fDevolucion = formatearFechaTexto(data.fechaDevolucion);
 
                     let trajeDetalles = `• Estilo 1: ${data.tipoTraje1 || 'N/A'}\n  - Saco: ${data.sacoTalla1 || '-'}\n  - Pantalón: ${data.pantalonTalla1 || '-'}\n  - Camisa: ${data.camisaTalla1 || '-'}\n  - Calzado: ${data.calzado1 || '-'}`;
                     if (data.tipoTraje2) {
                         trajeDetalles += `\n• Estilo 2: ${data.tipoTraje2}\n  - Saco: ${data.sacoTalla2 || '-'}\n  - Pantalón: ${data.pantalonTalla2 || '-'}\n  - Camisa: ${data.camisaTalla2 || '-'}\n  - Calzado: ${data.calzado2 || '-'}`;
                     }
 
-                    const mensajeWhatsApp = `*D&C Tuxedos - Confimación de Renta*\n` +
+                    const mensajeWhatsApp = `*D&C Tuxedos - Confirmación de Renta*\n` +
                         `📌 *Folio:* ${folioAsignado} (Nota: ${hojaAsignada})\n` +
                         `👤 *Cliente:* ${data.nombre}\n` +
                         `📞 *Teléfono:* ${data.telefono}\n\n` +
                         `👔 *Información del Traje:*\n${trajeDetalles}\n\n` +
                         `📅 *Fechas del Servicio:*\n` +
-                        `• Evento: ${data.fechaEvento || '-'}\n` +
-                        `• Entrega: ${data.fechaEntrega || '-'}\n` +
-                        `• Devolución: ${data.fechaDevolucion || '-'}\n\n` +
+                        `• Evento: ${fEvento}\n` +
+                        `• Entrega: ${fEntrega}\n` +
+                        `• Devolución: ${fDevolucion}\n\n` +
                         `💰 *Resumen de Importes:*\n` +
-                        `• Importe Total: $${imp}\n` +
-                        `• Anticipo: $${ant}\n` +
-                        `• *Saldo Pendiente: $${sal}*`;
+                        `• Importe Total: ${imp}\n` +
+                        `• Anticipo: ${ant}\n` +
+                        `• *Saldo Pendiente: ${sal}*`;
 
                     const whatsappLinkBtn = document.getElementById('whatsappLinkBtn');
                     if (whatsappLinkBtn) {
