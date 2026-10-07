@@ -828,32 +828,28 @@
         const folioDisplay = document.getElementById('folioDisplay');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // COLOCA AQUÍ TU URL DE GOOGLE APPS SCRIPT
-        const GOOGLE_SHEETS_URL = https:'https://script.google.com/macros/s/AKfycbw4KHScRB7AgoEq9XXDROM7iqDyihPSUiBjxJxYjRCW6Kx8oXSuI5RWcp87-sWxXKY/exec';
+      // Copia la URL exacta de tu implementación activa en Apps Script
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw4KHScRB7AgoEq9XXDROM7iqDyihPSUiBjxJxYjRCW6Kx8oXSul5RWcp87-sW.../exec';
 
-        // CONSULTA Y MUESTRA EL FOLIO EN TIEMPO REAL AL ABRIR LA PÁGINA
-        async function fetchNextFolio() {
-            folioDisplay.textContent = "Cargando...";
-            try {
-                const response = await fetch(GOOGLE_SHEETS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: "getFolio" }),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
-                const result = await response.json();
-                if (result.status === 'success' && result.nextFolio) {
-                    currentFolio = result.nextFolio;
-                    folioDisplay.textContent = currentFolio;
-                } else {
-                    folioDisplay.textContent = "3106";
-                    currentFolio = 3106;
-                }
-            } catch (error) {
-                console.error("Error al obtener folio:", error);
-                folioDisplay.textContent = "3106";
-                currentFolio = 3106;
-            }
+// Consulta el Folio en tiempo real al cargar la página
+async function fetchNextFolio() {
+    folioDisplay.textContent = "Cargando...";
+    try {
+        const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getFolio`);
+        const result = await response.json();
+        if (result.status === 'success' && result.nextFolio) {
+            currentFolio = result.nextFolio;
+            folioDisplay.textContent = currentFolio;
+        } else {
+            folioDisplay.textContent = "3106";
+            currentFolio = 3106;
         }
+    } catch (error) {
+        console.error("Error al consultar folio:", error);
+        folioDisplay.textContent = "3106";
+        currentFolio = 3106;
+    }
+}
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('fechaDisplay').textContent = new Date().toLocaleDateString('es-MX');
