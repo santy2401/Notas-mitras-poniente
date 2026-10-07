@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="./logo_dyc.png">
     <link rel="shortcut icon" type="image/png" href="./logo_dyc.png">
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx-fJR8P_7dRvQ5d5Q5q5q5q5q5q5q5q5"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx-fJR8P_7dRvQ5d5Q5q5q5q5q5q5q5q5&loading=async"></script>
     
     <style>
         * {
@@ -444,7 +444,7 @@
             background: white;
             border-radius: 16px;
             padding: 28px;
-            max-width: 400px;
+            max-width: 420px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
             position: relative;
@@ -811,7 +811,9 @@
                 📄 Descargar Comprobante (PDF)
             </button>
             <br>
-            <a href="https://wa.me/5218134107030" class="whatsapp-button" style="width: 100%;" target="_blank">Enviar Mensaje por WhatsApp</a>
+            <a href="https://wa.me/5218134107030" id="whatsappLinkBtn" class="whatsapp-button" style="width: 100%;" target="_blank">
+                Enviar Mensaje por WhatsApp
+            </a>
         </div>
     </div>
 
@@ -827,28 +829,26 @@
         const folioDisplay = document.getElementById('folioDisplay');
         const downloadBtn = document.getElementById('downloadBtn');
 
-      // Copia la URL exacta de tu implementación activa en Apps Script
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw4KHScRB7AgoEq9XXDROM7iqDyihPSUiBjxJxYjRCW6Kx8oXSuI5RWcp87-sWxXKY/exec';
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw4KHScRB7AgoEq9XXDROM7iqDyihPSUiBjxJxYjRCW6Kx8oXSuI5RWcp87-sWxXKY/exec';
 
-// Consulta el Folio en tiempo real al cargar la página
-async function fetchNextFolio() {
-    folioDisplay.textContent = "Cargando...";
-    try {
-        const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getFolio`);
-        const result = await response.json();
-        if (result.status === 'success' && result.nextFolio) {
-            currentFolio = result.nextFolio;
-            folioDisplay.textContent = currentFolio;
-        } else {
-            folioDisplay.textContent = "3106";
-            currentFolio = 3106;
+        async function fetchNextFolio() {
+            folioDisplay.textContent = "Cargando...";
+            try {
+                const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getFolio`);
+                const result = await response.json();
+                if (result.status === 'success' && result.nextFolio) {
+                    currentFolio = result.nextFolio;
+                    folioDisplay.textContent = currentFolio;
+                } else {
+                    folioDisplay.textContent = "3106";
+                    currentFolio = 3106;
+                }
+            } catch (error) {
+                console.error("Error al consultar folio:", error);
+                folioDisplay.textContent = "3106";
+                currentFolio = 3106;
+            }
         }
-    } catch (error) {
-        console.error("Error al consultar folio:", error);
-        folioDisplay.textContent = "3106";
-        currentFolio = 3106;
-    }
-}
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('fechaDisplay').textContent = new Date().toLocaleDateString('es-MX');
@@ -944,8 +944,38 @@ async function fetchNextFolio() {
                 
                 if (result && result.status === 'success') {
                     const folioAsignado = result.folio || currentFolio;
+                    const hojaAsignada = result.hoja || '';
                     folioDisplay.textContent = folioAsignado;
-                    
+
+                    // CONSTRUIR EL MENSAJE DETALLADO DE WHATSAPP
+                    const imp = parseFloat(data.importe || 0).toFixed(2);
+                    const ant = parseFloat(data.anticipo || 0).toFixed(2);
+                    const sal = parseFloat(data.saldo || 0).toFixed(2);
+
+                    let trajeDetalles = `• Estilo 1: ${data.tipoTraje1 || 'N/A'}\n  - Saco: ${data.sacoTalla1 || '-'}\n  - Pantalón: ${data.pantalonTalla1 || '-'}\n  - Camisa: ${data.camisaTalla1 || '-'}\n  - Calzado: ${data.calzado1 || '-'}`;
+                    if (data.tipoTraje2) {
+                        trajeDetalles += `\n• Estilo 2: ${data.tipoTraje2}\n  - Saco: ${data.sacoTalla2 || '-'}\n  - Pantalón: ${data.pantalonTalla2 || '-'}\n  - Camisa: ${data.camisaTalla2 || '-'}\n  - Calzado: ${data.calzado2 || '-'}`;
+                    }
+
+                    const mensajeWhatsApp = `*D&C Tuxedos - Confimación de Renta*\n` +
+                        `📌 *Folio:* ${folioAsignado} (Nota: ${hojaAsignada})\n` +
+                        `👤 *Cliente:* ${data.nombre}\n` +
+                        `📞 *Teléfono:* ${data.telefono}\n\n` +
+                        `👔 *Información del Traje:*\n${trajeDetalles}\n\n` +
+                        `📅 *Fechas del Servicio:*\n` +
+                        `• Evento: ${data.fechaEvento || '-'}\n` +
+                        `• Entrega: ${data.fechaEntrega || '-'}\n` +
+                        `• Devolución: ${data.fechaDevolucion || '-'}\n\n` +
+                        `💰 *Resumen de Importes:*\n` +
+                        `• Importe Total: $${imp}\n` +
+                        `• Anticipo: $${ant}\n` +
+                        `• *Saldo Pendiente: $${sal}*`;
+
+                    const whatsappLinkBtn = document.getElementById('whatsappLinkBtn');
+                    if (whatsappLinkBtn) {
+                        whatsappLinkBtn.href = `https://wa.me/5218134107030?text=${encodeURIComponent(mensajeWhatsApp)}`;
+                    }
+
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
                     downloadBtn.style.display = 'block';
