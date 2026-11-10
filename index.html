@@ -475,81 +475,44 @@
             margin-bottom: 10px;
         }
 
+        /* ===== IMPRESIÓN: TICKET TÉRMICO 80mm ===== */
+        #ticketImpresion { display: none; }
+        .btn-nuevo { background: #f5f5f7; color: #1d1d1f; width: 100%; border: 1px solid #d2d2d7; }
+
+        @page { margin: 0; }
+
         @media print {
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border-radius: 0; max-width: 100%; }
-            .button-group, .whatsapp-modal, .btn-download { display: none !important; }
+            html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+            body > *:not(#ticketImpresion) { display: none !important; }
+
+            #ticketImpresion {
+                display: block !important;
+                width: 72mm;
+                margin: 0 auto;
+                padding: 3mm 2mm 8mm;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 11px;
+                line-height: 1.3;
+                color: #000;
+                background: #fff;
+            }
+            #ticketImpresion div { word-wrap: break-word; }
+            .t-center { text-align: center; }
+            .t-logo { width: 26mm; height: auto; filter: grayscale(1) contrast(1.3); }
+            .t-brand { font-size: 15px; font-weight: bold; letter-spacing: 1px; }
+            .t-sep { border-top: 1px dashed #000; margin: 5px 0; }
+            .t-title { font-weight: bold; text-transform: uppercase; }
+            .t-folio { font-size: 18px; font-weight: bold; }
+            .t-row { display: flex; justify-content: space-between; }
+            .t-total { font-size: 13px; font-weight: bold; }
+            .t-small { font-size: 9px; line-height: 1.25; }
+            .t-firma { border-top: 1px solid #000; margin-top: 12mm; padding-top: 2px; text-align: center; font-size: 9px; }
         }
-        @media print {
-    /* Ocultamos absolutamente todo el diseño web normal por defecto */
-    body * {
-        visibility: hidden !important;
-    }
-
-    /* Hacemos visible únicamente el contenedor del ticket térmico */
-    #ticketImpresion, #ticketImpresion * {
-        visibility: visible !important;
-    }
-
-    #ticketImpresion {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 72mm; /* Ancho de ticket estándar */
-        font-family: 'Courier New', Courier, monospace; /* Letra clásica de ticket */
-        font-size: 11px;
-        color: #000;
-        padding: 5px;
-        margin: 0;
-        background: white;
-    }
-
-    .ticket-header {
-        text-align: center;
-        margin-bottom: 5px;
-    }
-
-    .ticket-header h3 {
-        font-size: 13px;
-        margin: 0;
-    }
-}
     </style>
 </head>
 <body>
-    <!-- FORMATO OCULTO EXCLUSIVO PARA IMPRESORA DE TICKETS -->
-<div id="ticketImpresion" style="display: none;">
-    <div class="ticket-header">
-        <h3>D&C TUXEDOS</h3>
-        <p id="tSucursal">Sucursal</p>
-        <p>------------------------------------</p>
-    </div>
-    <div class="ticket-body">
-        <p><strong>FOLIO:</strong> <span id="tFolio">-</span></p>
-        <p><strong>FECHA:</strong> <span id="tFecha">-</span></p>
-        <p>------------------------------------</p>
-        <p><strong>CLIENTE:</strong></p>
-        <p><span id="tNombre">-</span></p>
-        <p><strong>TEL:</strong> <span id="tTelefono">-</span></p>
-        <p>------------------------------------</p>
-        <p><strong>FECHAS CLAVE:</strong></p>
-        <p>Evento: <span id="tFechaEvento">-</span></p>
-        <p>Entrega: <span id="tFechaEntrega">-</span></p>
-        <p>Devolución: <span id="tFechaDevolucion">-</span></p>
-        <p>------------------------------------</p>
-        <p><strong>TRAJE / ESTILO:</strong></p>
-        <p><span id="tTraje1">-</span> (Talla: <span id="tSaco1">-</span>)</p>
-        <p>Pantalón: <span id="tPantalon1">-</span> | Camisa: <span id="tCamisa1">-</span></p>
-        <p>------------------------------------</p>
-        <p><strong>PAGO:</strong></p>
-        <p>Importe: $<span id="tImporte">0.00</span></p>
-        <p>Anticipo: $<span id="tAnticipo">0.00</span></p>
-        <p><strong>Saldo Pendiente: $<span id="tSaldo">0.00</span></strong></p>
-        <p>------------------------------------</p>
-        <p style="text-align: center; font-size: 10px;">¡Gracias por su preferencia!<br>Conserve este ticket.</p>
-    </div>
-</div>
+    <!-- TICKET PARA IMPRESIÓN (se genera por JavaScript al imprimir) -->
+<div id="ticketImpresion"></div>
     <div class="container">
         <!-- HEADER -->
         <div class="header">
@@ -579,8 +542,8 @@
                 ✓ Formulario enviado correctamente
             </div>
 
-            <button type="button" class="btn-download" id="downloadBtn" onclick="descargarHojaRenta()">
-                📄 Descargar / Imprimir Comprobante de Renta
+            <button type="button" class="btn-download" id="downloadBtn" onclick="mostrarWhatsApp()">
+                📄 Descargar / Enviar Comprobante
             </button>
 
             <div class="error-message" id="errorMessage">
@@ -866,19 +829,23 @@
         </div>
     </div>
 
-    <!-- MODAL WHATSAPP Y DESCARGA DE COMPROBANTE -->
+    <!-- MODAL POST-ENVÍO: DESCARGAR O ENVIAR POR WHATSAPP -->
     <div class="whatsapp-modal" id="whatsappModal">
         <div class="whatsapp-bubble">
-            <button class="close-modal" onclick="cerrarWhatsApp()">&times;</button>
+            <button type="button" class="close-modal" onclick="cerrarWhatsApp()">&times;</button>
             <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
             <h3>¡Formulario Guardado!</h3>
-            <p style="font-size: 14px; color: #666; margin-bottom: 15px;">Tu registro ha sido procesado con éxito.</p>
-            
-            <button type="button" class="whatsapp-button" style="background: #003d7a; width: 100%; margin-bottom: 10px;" onclick="descargarHojaRenta()">
-                📄 Descargar Comprobante (PDF)
+            <p style="font-size: 14px; color: #666; margin-bottom: 18px;">Folio <strong id="modalFolio">-</strong> registrado. ¿Qué deseas hacer?</p>
+
+            <button type="button" class="whatsapp-button" style="background: #003d7a; width: 100%;" onclick="descargarHojaRenta()">
+                📄 Descargar / Imprimir Comprobante
             </button>
-            <br>
-            <a href="https://wa.me/5218134107030" class="whatsapp-button" style="width: 100%;" target="_blank">Enviar Mensaje por WhatsApp</a>
+            <button type="button" class="whatsapp-button" style="width: 100%;" onclick="enviarWhatsAppCliente()">
+                💬 Enviar por WhatsApp al cliente
+            </button>
+            <button type="button" class="whatsapp-button btn-nuevo" onclick="nuevoRegistro()">
+                ➕ Nuevo registro
+            </button>
         </div>
     </div>
 
@@ -979,26 +946,155 @@ async function fetchNextFolio() {
         }
 
        
-        function imprimirTicketTermico() {
-    // 1. Rellenar los datos del ticket con lo que el usuario escribió en el formulario
-    document.getElementById('tFolio').textContent = currentFolio || '3106';
-    document.getElementById('tFecha').textContent = new Date().toLocaleDateString('es-MX');
-    document.getElementById('tNombre').textContent = document.getElementById('nombre').value || '-';
-    document.getElementById('tTelefono').textContent = document.getElementById('telefono').value || '-';
-    document.getElementById('tFechaEvento').textContent = document.getElementById('fechaEvento').value || '-';
-    document.getElementById('tFechaEntrega').textContent = document.getElementById('fechaEntrega').value || '-';
-    document.getElementById('tFechaDevolucion').textContent = document.getElementById('fechaDevolucion').value || '-';
-    document.getElementById('tTraje1').textContent = document.getElementById('tipoTraje1').value || '-';
-    document.getElementById('tSaco1').textContent = document.getElementById('sacoTalla1').value || '-';
-    document.getElementById('tPantalon1').textContent = document.getElementById('pantalonTalla1').value || '-';
-    document.getElementById('tCamisa1').textContent = document.getElementById('camisaTalla1').value || '-';
-    document.getElementById('tImporte').textContent = document.getElementById('importe').value || '0.00';
-    document.getElementById('tAnticipo').textContent = document.getElementById('anticipo').value || '0.00';
-    document.getElementById('tSaldo').textContent = document.getElementById('saldo').value || '0.00';
+        const TITULO_ORIGINAL = document.title;
+        let ultimoRegistro = null;
 
-    // 2. Mandar a imprimir (el CSS se encarga de ocultar todo lo demás)
-    window.print();
-}s
+        // ---------- Utilidades ----------
+        function esc(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function fechaCorta(iso) {
+            const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+            return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || '-');
+        }
+        function dinero(n) {
+            return '$' + (parseFloat(n) || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function val(d, k) { return String(d[k] || '').trim(); }
+
+        // ---------- Ticket ----------
+        function bloqueTraje(d, n) {
+            const v = k => val(d, k + n);
+            const hay = ['tipoTraje', 'sacoTalla', 'pantalonTalla', 'camisaTalla', 'calzado', 'accesorios'].some(k => v(k));
+            if (!hay) return '';
+            const prenda = (nombre, talla, etiq, extra) =>
+                talla ? `<div>${nombre}: ${esc(talla)}${extra ? ` (${etiq}: ${esc(extra)})` : ''}</div>` : '';
+            return `<div class="t-sep"></div><div class="t-title">Traje ${n}</div>`
+                + (v('tipoTraje') ? `<div>Estilo: ${esc(v('tipoTraje'))}</div>` : '')
+                + prenda('Saco', v('sacoTalla'), 'M', v('sacoManga'))
+                + prenda('Pantalón', v('pantalonTalla'), 'L', v('pantalonLargo'))
+                + prenda('Camisa', v('camisaTalla'), 'C', v('camisaCuello'))
+                + (v('calzado') ? `<div>Zapatos: ${esc(v('calzado'))}</div>` : '')
+                + (v('accesorios') ? `<div>Accesorios: ${esc(v('accesorios'))}</div>` : '');
+        }
+
+        function construirTicket(d) {
+            const domicilio = d.tipoEntrega === 'domicilio';
+            const dir = [val(d, 'direccion'), val(d, 'ciudad')].filter(Boolean).join(', ');
+            return `
+                <div class="t-center">
+                    <img class="t-logo" src="logo.jpg" alt="" onerror="this.style.display='none'">
+                    <div class="t-brand">D&amp;C TUXEDOS</div>
+                    <div class="t-small">Renta y Venta de Trajes &amp; Smoking</div>
+                    <div class="t-small">Guadalupe (81) 3499-0277<br>Apodaca (81) 2261-9347<br>García (81) 8212-9485</div>
+                </div>
+                <div class="t-sep"></div>
+                <div class="t-center">FOLIO<br><span class="t-folio">${esc(d.folio)}</span></div>
+                <div class="t-center">Fecha: ${esc(d.fecha)}</div>
+                <div class="t-sep"></div>
+                <div class="t-title">Cliente</div>
+                <div>${esc(val(d, 'nombre'))}</div>
+                <div>Tel: ${esc(val(d, 'telefono'))}</div>
+                ${dir ? `<div>${esc(dir)}</div>` : ''}
+                ${val(d, 'entreCalles') ? `<div>Entre: ${esc(val(d, 'entreCalles'))}</div>` : ''}
+                <div class="t-sep"></div>
+                <div class="t-title">Fechas</div>
+                <div class="t-row"><span>Evento:</span><span>${fechaCorta(d.fechaEvento)}</span></div>
+                <div class="t-row"><span>Entrega:</span><span>${fechaCorta(d.fechaEntrega)}</span></div>
+                <div class="t-row"><span>Devolución:</span><span>${fechaCorta(d.fechaDevolucion)}</span></div>
+                <div>Servicio: ${domicilio ? 'A DOMICILIO' : 'En sucursal'}</div>
+                ${domicilio && val(d, 'horarioEntrega') ? `<div>Horario: ${esc(val(d, 'horarioEntrega'))}</div>` : ''}
+                ${bloqueTraje(d, 1)}
+                ${bloqueTraje(d, 2)}
+                ${val(d, 'observaciones') ? `<div class="t-sep"></div><div class="t-title">Observaciones</div><div>${esc(val(d, 'observaciones'))}</div>` : ''}
+                <div class="t-sep"></div>
+                <div class="t-title">Pago${val(d, 'metodoPago') ? ' (' + esc(val(d, 'metodoPago')) + ')' : ''}</div>
+                <div class="t-row"><span>Importe:</span><span>${dinero(d.importe)}</span></div>
+                <div class="t-row"><span>Anticipo:</span><span>${dinero(d.anticipo)}</span></div>
+                <div class="t-row t-total"><span>SALDO:</span><span>${dinero(d.saldo)}</span></div>
+                <div class="t-sep"></div>
+                <div class="t-small">
+                    <strong>CONDICIONES</strong><br>
+                    1. Revise las prendas dentro de las 12 hrs posteriores a la entrega.<br>
+                    2. El anticipo no es reembolsable.<br>
+                    3. Devuelva las prendas completas y en buen estado; pérdida o daño genera cargo adicional.
+                </div>
+                <div class="t-firma">Firma del cliente</div>
+                <div class="t-sep"></div>
+                <div class="t-center t-small">¡Gracias por su preferencia!<br>Conserve este ticket.</div>`;
+        }
+
+        // Descargar (Guardar como PDF) o imprimir: ambos usan el diálogo de impresión
+        function descargarHojaRenta() {
+            if (!ultimoRegistro) {
+                alert('Primero envía el formulario para generar el comprobante.');
+                return;
+            }
+            document.getElementById('ticketImpresion').innerHTML = construirTicket(ultimoRegistro);
+            document.title = `Comprobante_DC_${ultimoRegistro.folio}`; // nombre sugerido del PDF
+            window.print();
+        }
+        window.addEventListener('afterprint', () => { document.title = TITULO_ORIGINAL; });
+
+        // ---------- WhatsApp al cliente ----------
+        function resumenTraje(d, n) {
+            const v = k => val(d, k + n);
+            if (!['tipoTraje', 'sacoTalla', 'pantalonTalla', 'camisaTalla'].some(k => v(k))) return '';
+            const partes = [];
+            if (v('sacoTalla')) partes.push(`Saco ${v('sacoTalla')}${v('sacoManga') ? ' (M: ' + v('sacoManga') + ')' : ''}`);
+            if (v('pantalonTalla')) partes.push(`Pantalón ${v('pantalonTalla')}${v('pantalonLargo') ? ' (L: ' + v('pantalonLargo') + ')' : ''}`);
+            if (v('camisaTalla')) partes.push(`Camisa ${v('camisaTalla')}${v('camisaCuello') ? ' (C: ' + v('camisaCuello') + ')' : ''}`);
+            return `*Traje ${n}:* ${v('tipoTraje') || '-'}${partes.length ? ' — ' + partes.join(', ') : ''}`;
+        }
+
+        function enviarWhatsAppCliente() {
+            if (!ultimoRegistro) return;
+            const d = ultimoRegistro;
+            const lineas = [
+                '*D&C TUXEDOS* 👔',
+                `Hola ${val(d, 'nombre')}, gracias por tu preferencia. Este es el resumen de tu renta:`,
+                '',
+                `*Folio:* ${d.folio}`,
+                `*Fecha del evento:* ${fechaCorta(d.fechaEvento)}`,
+                `*Entrega:* ${fechaCorta(d.fechaEntrega)}`,
+                `*Devolución:* ${fechaCorta(d.fechaDevolucion)}`,
+                resumenTraje(d, 1),
+                resumenTraje(d, 2),
+                '',
+                `*Importe:* ${dinero(d.importe)}`,
+                `*Anticipo:* ${dinero(d.anticipo)}`,
+                `*Saldo pendiente:* ${dinero(d.saldo)}`,
+                '',
+                'Recuerda devolver las prendas completas y en buen estado. ¡Gracias!'
+            ].filter((l, i, arr) => l !== '' || arr[i - 1] !== ''); // evita saltos dobles
+
+            // Número del cliente: 10 dígitos -> agrega lada de México (52)
+            let tel = val(d, 'telefono').replace(/\D/g, '');
+            if (tel.length === 10) tel = '52' + tel;
+            const num = (tel.length >= 12 && tel.startsWith('52')) ? tel : '';
+
+            window.open(`https://wa.me/${num}?text=${encodeURIComponent(lineas.join('\n'))}`, '_blank');
+        }
+
+        // ---------- Nuevo registro / limpiar ----------
+        function nuevoRegistro() {
+            cerrarWhatsApp();
+            form.reset();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        form.addEventListener('reset', () => {
+            setTimeout(() => {
+                updateSaldo();
+                document.getElementById('domicilioFields').style.display = 'none';
+                document.getElementById('mapContainer').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'none';
+                downloadBtn.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Formulario';
+                if (ultimoRegistro) { ultimoRegistro = null; fetchNextFolio(); }
+            }, 0);
+        });
 
         importeInput.addEventListener('input', updateSaldo);
         anticipoInput.addEventListener('input', updateSaldo);
@@ -1029,7 +1125,12 @@ async function fetchNextFolio() {
                 
                 if (result && result.status === 'success') {
                     const folioAsignado = result.folio || currentFolio;
+                    currentFolio = folioAsignado;
                     folioDisplay.textContent = folioAsignado;
+                    document.getElementById('modalFolio').textContent = folioAsignado;
+
+                    // Copia de los datos enviados (para ticket y WhatsApp)
+                    ultimoRegistro = { ...data, folio: folioAsignado, fecha: new Date().toLocaleDateString('es-MX') };
                     
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
@@ -1037,8 +1138,9 @@ async function fetchNextFolio() {
                     
                     mostrarWhatsApp();
 
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Enviar Formulario';
+                    // Evita reenviar el mismo formulario y duplicar el folio
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Enviado ✓';
                 } else {
                     throw new Error(result?.message || 'Error al procesar la respuesta');
                 }
