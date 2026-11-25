@@ -866,21 +866,21 @@ const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw4KHScRB7Ago
 
 // Consulta el Folio en tiempo real al cargar la página
 async function fetchNextFolio() {
+    const tipo = document.querySelector('input[name="tipoEntrega"]:checked')?.value || 'sucursal';
     folioDisplay.textContent = "Cargando...";
     try {
-        const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getFolio`);
+        const response = await fetch(`${GOOGLE_SHEETS_URL}?action=getFolio&tipo=${tipo}`);
         const result = await response.json();
         if (result.status === 'success' && result.nextFolio) {
             currentFolio = result.nextFolio;
             folioDisplay.textContent = currentFolio;
         } else {
-            folioDisplay.textContent = "3106";
-            currentFolio = 3106;
+            throw new Error(result.message || 'Respuesta sin folio');
         }
     } catch (error) {
         console.error("Error al consultar folio:", error);
-        folioDisplay.textContent = "3106";
-        currentFolio = 3106;
+        currentFolio = '';
+        folioDisplay.textContent = "Se asigna al enviar";
     }
 }
 
@@ -898,6 +898,7 @@ async function fetchNextFolio() {
                 } else {
                     domicilioFields.style.display = 'none';
                 }
+                fetchNextFolio(); // cada hoja (DOMICILIO / SUCURSAL) tiene su propio folio
             });
         });
 
